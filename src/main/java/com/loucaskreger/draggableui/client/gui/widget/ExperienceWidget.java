@@ -14,7 +14,7 @@ public class ExperienceWidget extends DraggableWidget {
 	private int scaledHeight;
 
 	public ExperienceWidget(int screenWidth, int screenHeight) {
-		super((screenWidth / 2) - 91, screenHeight - 29, WIDTH, HEIGHT, true);
+		super((screenWidth / 2) - 91, screenHeight - 29, WIDTH, HEIGHT, true, "Exp");
 
 		this.scaledWidth = screenWidth / 2;
 		this.scaledHeight = screenHeight / 2;

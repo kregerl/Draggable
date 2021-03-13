@@ -10,7 +10,7 @@ public class HealthWidget extends DraggableWidget {
 	private static final int HEIGHT = 9;
 
 	public HealthWidget(int screenWidth, int screenHeight) {
-		super((screenWidth / 2) - 91, screenHeight - ForgeIngameGui.left_height, WIDTH, HEIGHT, true);
+		super((screenWidth / 2) - 91, screenHeight - ForgeIngameGui.left_height, WIDTH, HEIGHT, true, "Health");
 	}
 
 	@Override

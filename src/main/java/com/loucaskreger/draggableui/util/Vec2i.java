@@ -12,6 +12,7 @@ public class Vec2i {
 	public final int x;
 	public final int y;
 
+
 	public Vec2i(int xIn, int yIn) {
 		this.x = xIn;
 		this.y = yIn;

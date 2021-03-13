@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.loucaskreger.draggableui.DraggableUI;
+import com.loucaskreger.draggableui.EventSubscriber;
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
 import com.loucaskreger.draggableui.client.gui.widget.ExperienceWidget;
 import com.loucaskreger.draggableui.client.gui.widget.HealthWidget;
@@ -34,23 +35,23 @@ public class DraggableScreen extends Screen {
 		this.width = mc.getMainWindow().getScaledWidth();
 
 		this.widgets = new ArrayList<DraggableWidget>();
-		this.widgets.add(new DraggableWidget(0, 0, WIDTH, HEIGHT, true) {
-			@Override
-			public void render(int mouseX, int mouseY, Screen screen) {
-				super.render(mouseX, mouseY, screen);
-				RenderSystem.pushMatrix();
-				RenderSystem.enableBlend();
-				screen.getMinecraft().getTextureManager()
-						.bindTexture(new ResourceLocation(DraggableUI.MOD_ID, "textures/gui/widget.png"));
-				screen.blit(this.getPos().x, this.getPos().y, 0, 0, this.width, this.height);
-				RenderSystem.disableBlend();
-				RenderSystem.popMatrix();
-			}
-		});
+//		this.widgets.add(new DraggableWidget(0, 0, WIDTH, HEIGHT, true, "Test") {
+//			@Override
+//			public void render(int mouseX, int mouseY, Screen screen) {
+//				super.render(mouseX, mouseY, screen);
+//				RenderSystem.pushMatrix();
+//				RenderSystem.enableBlend();
+//				screen.getMinecraft().getTextureManager()
+//						.bindTexture(new ResourceLocation(DraggableUI.MOD_ID, "textures/gui/widget.png"));
+//				screen.blit(this.getPos().x, this.getPos().y, 0, 0, this.width, this.height);
+//				RenderSystem.disableBlend();
+//				RenderSystem.popMatrix();
+//			}
+//		});
 		this.widgets.add(new HotbarWidget(this.width, this.height));
 		this.widgets.add(new HealthWidget(this.width, this.height));
-		this.widgets.add(new HungerWidget(this.width, this.height));
-		this.widgets.add(new ExperienceWidget(this.width, this.height));
+//		this.widgets.add(new HungerWidget(this.width, this.height));
+//		this.widgets.add(new ExperienceWidget(this.width, this.height));
 	}
 
 	public DraggableScreen() {
@@ -77,7 +78,15 @@ public class DraggableScreen extends Screen {
 	@Override
 	public boolean mouseDragged(double mouseX, double mouseY, int p_mouseDragged_5_, double p_mouseDragged_6_,
 			double p_mouseDragged_8_) {
-		this.widgets.forEach(i -> i.mouseDragged((int) Math.round(mouseX), (int) Math.round(mouseY)));
+		// When cursor hits side of wall rotate widget
+		this.widgets.forEach(i -> {
+			i.mouseDragged((int) Math.round(mouseX), (int) Math.round(mouseY));
+			// Confused since it will always collide with itself.
+			this.widgets.forEach(j -> {
+				System.out.println(i.collidesWith(j));
+			});
+
+		});
 		return false;
 	}
 
@@ -85,7 +94,7 @@ public class DraggableScreen extends Screen {
 	public void render(int mouseX, int mouseY, float partialTicks) {
 		this.widgets.forEach(i -> {
 			i.setEnabled(true);
-			i.setDrawingBoundingBox(true);
+			i.getBoundingBox().setVisible(true);
 			i.render(mouseX, mouseY, this);
 		});
 
@@ -102,7 +111,8 @@ public class DraggableScreen extends Screen {
 //		saveState()
 		ForgeIngameGui.renderHotbar = true;
 		ForgeIngameGui.renderHealth = true;
-		ForgeIngameGui.renderFood = true;
+		ForgeIngameGui.renderExperiance = true;
+		EventSubscriber.shouldRenderFood = true;
 	}
 
 	@Override

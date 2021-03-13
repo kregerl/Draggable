@@ -12,7 +12,7 @@ public class HotbarWidget extends DraggableWidget {
 	private static final int HEIGHT = 22;
 
 	public HotbarWidget(int screenWidth, int screenHeight) {
-		super((screenWidth / 2) - 91, screenHeight - 22, WIDTH, HEIGHT, true);
+		super((screenWidth / 2) - 91, screenHeight - 22, WIDTH, HEIGHT, true, "Hotbar");
 	}
 	// Rotate 90 degrees
 	// RenderSystem.rotatef(90, 1, 1, 0);

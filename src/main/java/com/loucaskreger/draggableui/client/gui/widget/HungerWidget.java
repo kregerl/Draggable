@@ -10,7 +10,7 @@ public class HungerWidget extends DraggableWidget {
 	private static final int HEIGHT = 9;
 
 	public HungerWidget(int screenWidth, int screenHeight) {
-		super((screenWidth / 2) + 91 - WIDTH, screenHeight - ForgeIngameGui.left_height, WIDTH, HEIGHT, true);
+		super((screenWidth / 2) + 91 - WIDTH, screenHeight - ForgeIngameGui.left_height, WIDTH, HEIGHT, true, "Hunger");
 	}
 
 	@Override

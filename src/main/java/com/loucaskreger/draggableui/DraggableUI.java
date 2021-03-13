@@ -1,5 +1,7 @@
 package com.loucaskreger.draggableui;
 
+import com.loucaskreger.draggableui.util.WidgetLoader;
+
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -15,6 +17,7 @@ public class DraggableUI {
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupCommon);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
 
+		WidgetLoader.init();
 	}
 
 	private void setupCommon(final FMLCommonSetupEvent event) {
@@ -23,6 +26,7 @@ public class DraggableUI {
 
 	private void setupClient(final FMLClientSetupEvent event) {
 		ClientRegistry.registerKeyBinding(EventSubscriber.key);
+		WidgetLoader.INSTANCE.loadWidgets();
 	}
 
 }
