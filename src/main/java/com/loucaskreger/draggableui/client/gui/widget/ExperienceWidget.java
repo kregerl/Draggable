@@ -1,5 +1,7 @@
 package com.loucaskreger.draggableui.client.gui.widget;
 
+import com.loucaskreger.draggableui.client.gui.screen.DraggableScreen;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
@@ -13,11 +15,11 @@ public class ExperienceWidget extends DraggableWidget {
 	private int scaledWidth;
 	private int scaledHeight;
 
-	public ExperienceWidget(int screenWidth, int screenHeight) {
-		super((screenWidth / 2) - 91, screenHeight - 29, WIDTH, HEIGHT, true, "Exp");
+	public ExperienceWidget(DraggableScreen screen) {
+		super((screen.width / 2) - 91, screen.height - 29, WIDTH, HEIGHT, true, "Exp", screen);
 
-		this.scaledWidth = screenWidth / 2;
-		this.scaledHeight = screenHeight / 2;
+		this.scaledWidth = screen.width / 2;
+		this.scaledHeight = screen.height / 2;
 	}
 
 	@Override

@@ -12,7 +12,6 @@ public class Vec2i {
 	public final int x;
 	public final int y;
 
-
 	public Vec2i(int xIn, int yIn) {
 		this.x = xIn;
 		this.y = yIn;
@@ -24,6 +23,14 @@ public class Vec2i {
 
 	public boolean equals(Vec2i other) {
 		return this.x == other.x && this.y == other.y;
+	}
+
+	public Vec2i add(Vec2i pos) {
+		return add(pos.x, pos.y);
+	}
+
+	public Vec2i add(int x, int y) {
+		return new Vec2i(this.x + x, this.y + y);
 	}
 
 }

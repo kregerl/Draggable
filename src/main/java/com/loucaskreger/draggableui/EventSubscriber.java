@@ -35,8 +35,6 @@ public class EventSubscriber {
 	public static void onGUIRender(final RenderGameOverlayEvent.Pre event) {
 		if (event.getType().equals(RenderGameOverlayEvent.ElementType.ALL) && !shouldRenderFood) {
 			ForgeIngameGui.renderFood = false;
-		} else {
-			ForgeIngameGui.renderFood = true;
 		}
 	}
 }

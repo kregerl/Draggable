@@ -1,5 +1,6 @@
 package com.loucaskreger.draggableui.client.gui.widget;
 
+import com.loucaskreger.draggableui.client.gui.screen.DraggableScreen;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.screen.Screen;
@@ -11,8 +12,8 @@ public class HotbarWidget extends DraggableWidget {
 	private static final int WIDTH = 182;
 	private static final int HEIGHT = 22;
 
-	public HotbarWidget(int screenWidth, int screenHeight) {
-		super((screenWidth / 2) - 91, screenHeight - 22, WIDTH, HEIGHT, true, "Hotbar");
+	public HotbarWidget(DraggableScreen screen) {
+		super((screen.width / 2) - 91, screen.height - 22, WIDTH, HEIGHT, true, "Hotbar", screen);
 	}
 	// Rotate 90 degrees
 	// RenderSystem.rotatef(90, 1, 1, 0);

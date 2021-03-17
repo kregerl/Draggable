@@ -10,6 +10,8 @@ import com.loucaskreger.draggableui.client.gui.widget.ExperienceWidget;
 import com.loucaskreger.draggableui.client.gui.widget.HealthWidget;
 import com.loucaskreger.draggableui.client.gui.widget.HotbarWidget;
 import com.loucaskreger.draggableui.client.gui.widget.HungerWidget;
+import com.loucaskreger.draggableui.util.BoundingBox;
+import com.loucaskreger.draggableui.util.Vec2i;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.Minecraft;
@@ -29,29 +31,32 @@ public class DraggableScreen extends Screen {
 	// FMLPaths.GAMEDIR.get().resolve("mymod/data.nbt")
 	public List<DraggableWidget> widgets;
 
+	public BoundingBox interiorBounds;
+
 	public DraggableScreen(ITextComponent titleIn) {
 		super(titleIn);
 		this.height = mc.getMainWindow().getScaledHeight();
 		this.width = mc.getMainWindow().getScaledWidth();
+		this.interiorBounds = new BoundingBox(new Vec2i(0, 0), null, this.width, this.height);
 
 		this.widgets = new ArrayList<DraggableWidget>();
-//		this.widgets.add(new DraggableWidget(0, 0, WIDTH, HEIGHT, true, "Test") {
-//			@Override
-//			public void render(int mouseX, int mouseY, Screen screen) {
-//				super.render(mouseX, mouseY, screen);
-//				RenderSystem.pushMatrix();
-//				RenderSystem.enableBlend();
-//				screen.getMinecraft().getTextureManager()
-//						.bindTexture(new ResourceLocation(DraggableUI.MOD_ID, "textures/gui/widget.png"));
-//				screen.blit(this.getPos().x, this.getPos().y, 0, 0, this.width, this.height);
-//				RenderSystem.disableBlend();
-//				RenderSystem.popMatrix();
-//			}
-//		});
-		this.widgets.add(new HotbarWidget(this.width, this.height));
-		this.widgets.add(new HealthWidget(this.width, this.height));
-//		this.widgets.add(new HungerWidget(this.width, this.height));
-//		this.widgets.add(new ExperienceWidget(this.width, this.height));
+		this.widgets.add(new DraggableWidget(0, 0, WIDTH, HEIGHT, true, "Test", this) {
+			@Override
+			public void render(int mouseX, int mouseY, Screen screen) {
+				super.render(mouseX, mouseY, screen);
+				RenderSystem.pushMatrix();
+				RenderSystem.enableBlend();
+				screen.getMinecraft().getTextureManager()
+						.bindTexture(new ResourceLocation(DraggableUI.MOD_ID, "textures/gui/widget.png"));
+				screen.blit(this.getPos().x, this.getPos().y, 0, 0, this.width, this.height);
+				RenderSystem.disableBlend();
+				RenderSystem.popMatrix();
+			}
+		});
+//		this.widgets.add(new HotbarWidget(this));
+//		this.widgets.add(new HealthWidget(this));
+		this.widgets.add(new HungerWidget(this));
+		this.widgets.add(new ExperienceWidget(this));
 	}
 
 	public DraggableScreen() {
@@ -71,7 +76,10 @@ public class DraggableScreen extends Screen {
 
 	@Override
 	public boolean mouseReleased(double mouseX, double mouseY, int scrollDelta) {
-		this.widgets.forEach(i -> i.setSelected(false));
+		this.widgets.forEach(i -> {
+			i.setSelected(false);
+			i.mouseReleased();
+		});
 		return super.mouseReleased(mouseX, mouseY, scrollDelta);
 	}
 
@@ -81,10 +89,6 @@ public class DraggableScreen extends Screen {
 		// When cursor hits side of wall rotate widget
 		this.widgets.forEach(i -> {
 			i.mouseDragged((int) Math.round(mouseX), (int) Math.round(mouseY));
-			// Confused since it will always collide with itself.
-			this.widgets.forEach(j -> {
-				System.out.println(i.collidesWith(j));
-			});
 
 		});
 		return false;
