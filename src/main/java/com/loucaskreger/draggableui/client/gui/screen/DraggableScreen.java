@@ -1,62 +1,102 @@
 package com.loucaskreger.draggableui.client.gui.screen;
 
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_K;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.loucaskreger.draggableui.DraggableUI;
-import com.loucaskreger.draggableui.EventSubscriber;
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
-import com.loucaskreger.draggableui.client.gui.widget.ExperienceWidget;
 import com.loucaskreger.draggableui.client.gui.widget.HealthWidget;
-import com.loucaskreger.draggableui.client.gui.widget.HotbarWidget;
-import com.loucaskreger.draggableui.client.gui.widget.HungerWidget;
-import com.loucaskreger.draggableui.util.BoundingBox;
+import com.loucaskreger.draggableui.util.BoundingBox2D;
 import com.loucaskreger.draggableui.util.Vec2i;
-import com.mojang.blaze3d.systems.RenderSystem;
-
+import com.loucaskreger.draggableui.util.WidgetManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class DraggableScreen extends Screen {
 
 	private static final Minecraft mc = Minecraft.getInstance();
-	private static final int HEIGHT = 165;
-	private static final int WIDTH = 247;
 
 	// Save data in .minecraft/something
 	// FMLPaths.GAMEDIR.get().resolve("mymod/data.nbt")
-	public List<DraggableWidget> widgets;
 
-	public BoundingBox interiorBounds;
+	// Movable widgets
+	public List<DraggableWidget> widgets;
+	// static objects that cant be moved
+	public List<BoundingBox2D> staticWidgets;
+
+	public BoundingBox2D interiorBounds;
 
 	public DraggableScreen(ITextComponent titleIn) {
 		super(titleIn);
+		this.widgets = new ArrayList<DraggableWidget>();
+		this.staticWidgets = new ArrayList<BoundingBox2D>();
+
 		this.height = mc.getMainWindow().getScaledHeight();
 		this.width = mc.getMainWindow().getScaledWidth();
-		this.interiorBounds = new BoundingBox(new Vec2i(0, 0), null, this.width, this.height);
 
-		this.widgets = new ArrayList<DraggableWidget>();
-		this.widgets.add(new DraggableWidget(0, 0, WIDTH, HEIGHT, true, "Test", this) {
-			@Override
-			public void render(int mouseX, int mouseY, Screen screen) {
-				super.render(mouseX, mouseY, screen);
-				RenderSystem.pushMatrix();
-				RenderSystem.enableBlend();
-				screen.getMinecraft().getTextureManager()
-						.bindTexture(new ResourceLocation(DraggableUI.MOD_ID, "textures/gui/widget.png"));
-				screen.blit(this.getPos().x, this.getPos().y, 0, 0, this.width, this.height);
-				RenderSystem.disableBlend();
-				RenderSystem.popMatrix();
-			}
+		System.out.println(WidgetManager.INSTANCE.widgets.size());
+		if (WidgetManager.INSTANCE.isDirty()) {
+			WidgetManager.INSTANCE.loadWidgets();
+		}
+		WidgetManager.INSTANCE.widgets.forEach(i -> {
+			i.setScreen(this);
+			i.setEnabled(true);
+			i.setShouldMoveToDefaultPos(false);
+			this.widgets.add(i);
 		});
-//		this.widgets.add(new HotbarWidget(this));
-//		this.widgets.add(new HealthWidget(this));
-		this.widgets.add(new HungerWidget(this));
-		this.widgets.add(new ExperienceWidget(this));
+		if (WidgetManager.INSTANCE.widgets.isEmpty()) {
+			IForgeRegistry<DraggableWidget> registry = GameRegistry.findRegistry(DraggableWidget.class);
+			registry.forEach(i -> {
+				System.out.println("Registry Name: " + i.getRegistryName());
+				System.out.println(i instanceof HealthWidget);
+				i.setScreen(this);
+				i.setEnabled(true);
+				this.widgets.add(i);
+			});
+		}
+//		if (!moreWidgets.isEmpty()) {
+//			this.widgets.addAll(moreWidgets);
+//		}
+
+//		if (something != null) {
+//			System.out.println("Inside Here");
+//			something.setScreen(this);
+//			something.setEnabled(true);
+//			something.getBoundingBox().setVisible(true);
+//			something.getBoundingBox().setPos(new Vec2i(0, 0));
+////			something.getBoundingBox().setWidth(182);
+//			something.getBoundingBox().setColor(new Color4f(0f, 0.48f, 0.35f, 1f));
+//			this.widgets.add(something);
+//		}
+//		System.out.println(this.widgets.size());
+
+		this.interiorBounds = new BoundingBox2D(new Vec2i(0, 0), this.width, this.height);
+
+		// Bottom Bound
+		this.staticWidgets.add(new BoundingBox2D(interiorBounds.getPos().add(0, interiorBounds.getHeight() + 1),
+				interiorBounds.getWidth(), 5));
+		// Top Bound
+		this.staticWidgets.add(new BoundingBox2D(interiorBounds.getPos().subtract(0, 6), interiorBounds.getWidth(), 5));
+		// Left Bound
+		this.staticWidgets
+				.add(new BoundingBox2D(interiorBounds.getPos().subtract(6, 0), 5, interiorBounds.getHeight()));
+		// Right Bound
+		this.staticWidgets.add(new BoundingBox2D(interiorBounds.getPos().add(interiorBounds.getWidth() + 1, 0), 5,
+				interiorBounds.getHeight()));
+
+		int crosshairSize = 9;
+		// Vertical crosshair bound
+		this.staticWidgets.add(new BoundingBox2D(
+				new Vec2i(this.width % 2 != 0 ? (this.width / 2) : (this.width / 2) - 1, (this.height / 2) - 5), 1,
+				crosshairSize));
+		// Horizontal crosshair bound
+		this.staticWidgets.add(new BoundingBox2D(
+				new Vec2i(this.width % 2 != 0 ? (this.width / 2) - 4 : (this.width / 2) - 5, (this.height / 2) - 1),
+				crosshairSize, 1));
+
 	}
 
 	public DraggableScreen() {
@@ -64,7 +104,14 @@ public class DraggableScreen extends Screen {
 	}
 
 	@Override
+	public void tick() {
+		this.widgets.forEach(i -> i.tick());
+		super.tick();
+	}
+
+	@Override
 	public void init() {
+		this.widgets.forEach(i -> i.init());
 	}
 
 	@Override
@@ -77,8 +124,10 @@ public class DraggableScreen extends Screen {
 	@Override
 	public boolean mouseReleased(double mouseX, double mouseY, int scrollDelta) {
 		this.widgets.forEach(i -> {
-			i.setSelected(false);
 			i.mouseReleased();
+		});
+		this.staticWidgets.forEach(i -> {
+			i.drawBoundingBoxOutline();
 		});
 		return super.mouseReleased(mouseX, mouseY, scrollDelta);
 	}
@@ -97,9 +146,11 @@ public class DraggableScreen extends Screen {
 	@Override
 	public void render(int mouseX, int mouseY, float partialTicks) {
 		this.widgets.forEach(i -> {
-			i.setEnabled(true);
-			i.getBoundingBox().setVisible(true);
-			i.render(mouseX, mouseY, this);
+//			i.getBoundingBox().setVisible(true);
+			i.render(mouseX, mouseY, partialTicks, this);
+		});
+		this.staticWidgets.forEach(i -> {
+			i.drawBoundingBoxOutline();
 		});
 
 		super.render(mouseX, mouseY, partialTicks);
@@ -111,17 +162,26 @@ public class DraggableScreen extends Screen {
 
 	@Override
 	public void onClose() {
+		WidgetManager.INSTANCE.saveState(this.widgets);
+//		GuiRenderer.drawWidgets(this.widgets);
+		this.widgets.forEach(i -> i.onClose());
 		super.onClose();
-//		saveState()
-		ForgeIngameGui.renderHotbar = true;
-		ForgeIngameGui.renderHealth = true;
-		ForgeIngameGui.renderExperiance = true;
-		EventSubscriber.shouldRenderFood = true;
+
 	}
 
 	@Override
 	public boolean isPauseScreen() {
 		return false;
+	}
+
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+
+		if (super.keyPressed(keyCode, scanCode, modifiers) || keyCode == GLFW_KEY_K) {
+			this.onClose();
+		}
+		return true;
+
 	}
 
 }

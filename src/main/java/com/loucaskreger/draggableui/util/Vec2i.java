@@ -25,11 +25,32 @@ public class Vec2i {
 		return this.x == other.x && this.y == other.y;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("X: %d, Y: %d", x, y);
+	}
+
 	public Vec2i add(Vec2i pos) {
 		return add(pos.x, pos.y);
 	}
 
 	public Vec2i add(int x, int y) {
+		return new Vec2i(this.x + x, this.y + y);
+	}
+
+	public Vec2i add(double x, double y) {
+		return new Vec2i((int) Math.round(this.x + x), (int) Math.round(this.y + y));
+	}
+
+	public Vec2i subtract(Vec2i pos) {
+		return new Vec2i(this.x - pos.x, this.y - pos.y);
+	}
+
+	public Vec2i subtract(int x, int y) {
+		return this.subtract(new Vec2i(x, y));
+	}
+
+	public Vec2i multiplyBy(int x, int y) {
 		return new Vec2i(this.x + x, this.y + y);
 	}
 

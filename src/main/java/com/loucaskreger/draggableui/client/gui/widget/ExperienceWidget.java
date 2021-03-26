@@ -1,59 +1,43 @@
 package com.loucaskreger.draggableui.client.gui.widget;
 
-import com.loucaskreger.draggableui.client.gui.screen.DraggableScreen;
-
+import com.loucaskreger.draggableui.client.gui.GuiRenderer;
+import com.loucaskreger.draggableui.util.DefaultWidgetConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraftforge.client.gui.ForgeIngameGui;
 
 public class ExperienceWidget extends DraggableWidget {
 
 	private static final Minecraft mc = Minecraft.getInstance();
-	private static final int WIDTH = 182;
-	private static final int HEIGHT = 5;
 
-	private int scaledWidth;
-	private int scaledHeight;
-
-	public ExperienceWidget(DraggableScreen screen) {
-		super((screen.width / 2) - 91, screen.height - 29, WIDTH, HEIGHT, true, "Exp", screen);
-
-		this.scaledWidth = screen.width / 2;
-		this.scaledHeight = screen.height / 2;
+	public ExperienceWidget() {
+		super(0, 0, DefaultWidgetConstants.EXPERIENCE_WIDTH, DefaultWidgetConstants.EXPERIENCE_HEIGHT);
+		this.defaultPosition = DefaultWidgetConstants.getExperiencePos();
 	}
 
 	@Override
-	public void render(int mouseX, int mouseY, Screen screen) {
-		super.render(mouseX, mouseY, screen);
-		this.renderExpBar(this.getPos().x, this.getPos().y, screen);
-	}
-
-	public void renderExpBar(int x, int y, Screen screen) {
-		mc.getProfiler().startSection("expBar");
-		mc.getTextureManager().bindTexture(AbstractGui.GUI_ICONS_LOCATION);
-		int i = mc.player.xpBarCap();
-		if (i > 0) {
-			int j = 182;
-			int k = (int) (mc.player.experience * 183.0F);
-			screen.blit(x, y, 0, 64, 182, 5);
-			if (k > 0) {
-				screen.blit(x, y, 0, 69, k, 5);
+	public void render(int mouseX, int mouseY, float partialTicks, AbstractGui screen) {
+		super.render(mouseX, mouseY, partialTicks, screen);
+		if (this.isEnabled()) {
+			if (this.parentScreen != null) {
+				GuiRenderer.renderExpBar(this.getBoundingBox().getPos().x, this.getBoundingBox().getPos().y,
+						this.parentScreen.width, this.parentScreen.height, screen);
+			} else {
+				GuiRenderer.renderExpBar(this.getBoundingBox().getPos().x, this.getBoundingBox().getPos().y,
+						mc.getMainWindow().getScaledWidth(), mc.getMainWindow().getScaledHeight(), screen);
 			}
 		}
-
-		mc.getProfiler().endSection();
-		if (mc.player.experienceLevel > 0) {
-			mc.getProfiler().startSection("expLevel");
-			String s = "" + mc.player.experienceLevel;
-			int i1 = (this.scaledWidth - mc.fontRenderer.getStringWidth(s)) / 2;
-			int j1 = this.scaledHeight - 31 - 4;
-			mc.fontRenderer.drawString(s, (float) (i1 + 1), (float) j1, 0);
-			mc.fontRenderer.drawString(s, (float) (i1 - 1), (float) j1, 0);
-			mc.fontRenderer.drawString(s, (float) i1, (float) (j1 + 1), 0);
-			mc.fontRenderer.drawString(s, (float) i1, (float) (j1 - 1), 0);
-			mc.fontRenderer.drawString(s, (float) i1, (float) j1, 8453920);
-			mc.getProfiler().endSection();
-		}
-
 	}
+
+	@Override
+	public void mouseReleased() {
+		super.mouseReleased();
+	}
+
+	@Override
+	public void onClose() {
+		super.onClose();
+		ForgeIngameGui.renderExperiance = false;
+	}
+
 }
