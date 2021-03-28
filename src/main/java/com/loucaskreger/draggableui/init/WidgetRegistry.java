@@ -2,10 +2,12 @@ package com.loucaskreger.draggableui.init;
 
 import com.loucaskreger.draggableui.DraggableUI;
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
+import com.loucaskreger.draggableui.client.gui.widget.ExperienceLevelWidget;
 import com.loucaskreger.draggableui.client.gui.widget.ExperienceWidget;
 import com.loucaskreger.draggableui.client.gui.widget.HealthWidget;
 import com.loucaskreger.draggableui.client.gui.widget.HotbarWidget;
 import com.loucaskreger.draggableui.client.gui.widget.HungerWidget;
+
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 
@@ -28,5 +30,8 @@ public class WidgetRegistry {
 
 	public static final RegistryObject<DraggableWidget> HEALTH_WIDGET = WIDGETS.register("health_widget",
 			() -> new HealthWidget());
+
+	public static final RegistryObject<DraggableWidget> EXPERIENCE_LEVEL_WIDGET = WIDGETS
+			.register("experience_level_widget", () -> new ExperienceLevelWidget());
 
 }

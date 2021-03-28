@@ -1,15 +1,15 @@
 package com.loucaskreger.draggableui.client.gui.widget;
 
+import com.loucaskreger.draggableui.client.gui.GuiRenderer;
 import com.loucaskreger.draggableui.util.DefaultWidgetConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 public class HotbarWidget extends DraggableWidget {
 
-	private static final ResourceLocation WIDGETS_TEX_PATH = new ResourceLocation("textures/gui/widgets.png");
 	private static final Minecraft mc = Minecraft.getInstance();
 
 	public HotbarWidget() {
@@ -26,16 +26,19 @@ public class HotbarWidget extends DraggableWidget {
 	public void render(int mouseX, int mouseY, float partialTicks, AbstractGui screen) {
 		super.render(mouseX, mouseY, partialTicks, screen);
 		if (this.isEnabled()) {
-			// Use vanilla render for the hotbar since it is opaque.
+			mc.gameSettings.heldItemTooltips = false;
 			RenderSystem.pushMatrix();
 			RenderSystem.enableBlend();
+			GuiRenderer.renderHotbar(this.getBoundingBox().getPos().x, this.getBoundingBox().getPos().y, partialTicks,
+					mc.getMainWindow().getScaledWidth(), mc.getMainWindow().getScaledHeight(), screen,
+					this.parentScreen == null);
 
-			mc.getTextureManager().bindTexture(WIDGETS_TEX_PATH);
-			screen.blit(this.getBoundingBox().getPos().x, this.getBoundingBox().getPos().y, 0, 0,
-					this.getBoundingBox().getWidth(), this.getBoundingBox().getHeight());
-
-			RenderSystem.disableBlend();
+			GuiRenderer.renderSelectedItem(mc.player.getHeldItemMainhand(), this.getBoundingBox().getPos().x,
+					this.getBoundingBox().getPos().y, mc.getMainWindow().getScaledWidth(),
+					mc.getMainWindow().getScaledHeight());
 			RenderSystem.popMatrix();
+			RenderSystem.disableBlend();
+
 		}
 	}
 
@@ -43,5 +46,13 @@ public class HotbarWidget extends DraggableWidget {
 	public void onClose() {
 		super.onClose();
 		ForgeIngameGui.renderHotbar = false;
+		mc.gameSettings.heldItemTooltips = true;
+	}
+
+	@Override
+	public void tick() {
+		super.tick();
+		// Check offhand every tick, adjust boundingbox size according to which side the
+		// offhand is on.
 	}
 }

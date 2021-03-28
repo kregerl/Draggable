@@ -1,12 +1,17 @@
 package com.loucaskreger.draggableui.util;
 
 import java.util.List;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraftforge.common.util.INBTSerializable;
 
-public class BoundingBox2D {
+public class BoundingBox2D implements INBTSerializable<CompoundNBT> {
 
 	private Vec2i pos;
 	private Vec2i velocity;
@@ -26,6 +31,10 @@ public class BoundingBox2D {
 
 	public BoundingBox2D(Vec2i pos, int width, int height) {
 		this(pos, width, height, new Color4f(1f, 0f, 0f, 1f));
+	}
+
+	BoundingBox2D(CompoundNBT nbt) {
+		this.deserializeNBT(nbt);
 	}
 
 	@Override
@@ -106,6 +115,7 @@ public class BoundingBox2D {
 
 	public void drawBoundingBoxOutline() {
 		if (this.isVisible()) {
+			RenderSystem.pushMatrix();
 			IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
 			IVertexBuilder builder = buffer.getBuffer(RenderType.LINES);
 
@@ -121,6 +131,7 @@ public class BoundingBox2D {
 			this.drawLine(builder, new Vec2i(this.getLeft(), this.getBottom()),
 					new Vec2i(this.getLeft(), this.getTop()));
 			buffer.finish(RenderType.LINES);
+			RenderSystem.popMatrix();
 		}
 	}
 
@@ -183,6 +194,32 @@ public class BoundingBox2D {
 
 	public void setColor(Color4f color) {
 		this.color = color;
+	}
+
+	@Override
+	public CompoundNBT serializeNBT() {
+		CompoundNBT nbt = new CompoundNBT();
+		nbt.put("pos", this.getPos().serializeNBT());
+		nbt.put("velocity", this.getVelocity().serializeNBT());
+		nbt.putInt("width", this.getWidth());
+		nbt.putInt("height", this.getHeight());
+		nbt.putBoolean("visible", this.isVisible());
+		nbt.put("color", this.color.serializeNBT());
+		return nbt;
+	}
+
+	@Override
+	public void deserializeNBT(CompoundNBT nbt) {
+		this.setPos(Vec2i.read((CompoundNBT) nbt.get("pos")));
+		this.setVelocity(Vec2i.read((CompoundNBT) nbt.getCompound("velocity")));
+		this.setWidth(nbt.getInt("width"));
+		this.setHeight(nbt.getInt("height"));
+		this.setVisible(nbt.getBoolean("visible"));
+		this.setColor(new Color4f((CompoundNBT) nbt.get("color")));
+	}
+
+	public static BoundingBox2D read(CompoundNBT nbt) {
+		return new BoundingBox2D(nbt);
 	}
 
 }

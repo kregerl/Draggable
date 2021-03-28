@@ -16,10 +16,11 @@ import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> {
+public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> implements INBTSerializable<CompoundNBT> {
 
 	private BoundingBox2D boundingBox;
 	private BoundingBox2D cursorBoundingBox;
@@ -58,11 +59,16 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> {
 		this(pos.x, pos.y, width, height);
 	}
 
+	public DraggableWidget(BoundingBox2D box) {
+		this(box.getPos(), box.getWidth(), box.getHeight());
+	}
+
 	public void mouseClicked(double mouseX, double mouseY) {
-		if (this.cursorPos != null) {
-			this.prevCursorPos = this.cursorPos;
-		}
-		this.cursorPos = new Vec2i(mouseX, mouseY);
+		this.updateCursorPositions(mouseX, mouseY);
+//		if (this.cursorPos != null) {
+//			this.prevCursorPos = this.cursorPos;
+//		}
+//		this.cursorPos = new Vec2i(mouseX, mouseY);
 
 		if (this.cursorPos != null) {
 			this.cursorBoundingBox = new BoundingBox2D(this.cursorPos, this.getBoundingBox().getWidth(),
@@ -91,45 +97,67 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> {
 				(int) Math.round(mouseY) - this.boundingBox.getPos().y);
 	}
 
+	private void updateCursorPositions(double mouseX, double mouseY) {
+		if (this.cursorPos != null) {
+			this.prevCursorPos = this.cursorPos;
+		}
+		this.cursorPos = new Vec2i(mouseX, mouseY);
+	}
+
+	protected Vec2i getCursorVelocity() {
+		Vec2i vec = this.prevCursorPos.subtract(this.cursorPos);
+		Vec2i result = Vec2i.ZERO;
+		if (this.prevCursorPos != null) {
+			if (this.prevCursorPos.x < this.cursorPos.x) {
+				result.add(new Vec2i(-vec.x, 0));
+			} else if (this.prevCursorPos.x > this.cursorPos.x) {
+				result.add(new Vec2i(-vec.x, 0));
+			}
+
+			if (this.prevCursorPos.y < this.cursorPos.y) {
+				result.add(new Vec2i(0, -vec.y));
+			} else if (this.prevCursorPos.y > this.cursorPos.y) {
+				result.add(new Vec2i(0, -vec.y));
+			}
+
+		}
+		return result;
+	}
+
+	protected List<BoundingBox2D> getWidgetBounds() {
+		List<BoundingBox2D> widgetBoundingBoxes = new ArrayList<BoundingBox2D>();
+		this.parentScreen.widgets.forEach(i -> {
+			if (i != this)
+				widgetBoundingBoxes.add(i.getBoundingBox());
+		});
+		return widgetBoundingBoxes;
+	}
+
 	public void mouseDragged(int mouseX, int mouseY) {
 		if (this.isSelected() && this.parentScreen != null) {
-			if (this.cursorPos != null) {
-				this.prevCursorPos = this.cursorPos;
-			}
-			this.cursorPos = new Vec2i(mouseX, mouseY);
+			this.updateCursorPositions(mouseX, mouseY);
 
 			if (this.cursorBoundingBox != null) {
 				this.cursorBoundingBox.setPos(this.cursorPos.subtract(this.mouseOffset));
 				this.cursorBoundingBox.setVisible(true);
 			}
 			// Apply velocity based on mouse cursor position
-			Vec2i vec = this.prevCursorPos.subtract(this.cursorPos);
-			if (this.prevCursorPos != null) {
-				if (this.prevCursorPos.x < mouseX) {
-					this.getBoundingBox().addVelocity(new Vec2i(-vec.x, 0));
-				} else if (this.prevCursorPos.x > mouseX) {
-					this.getBoundingBox().addVelocity(new Vec2i(-vec.x, 0));
-				}
+			Vec2i velocity = this.getCursorVelocity();
+			this.getBoundingBox().addVelocity(velocity);
 
-				if (this.prevCursorPos.y < mouseY) {
-					this.getBoundingBox().addVelocity(new Vec2i(0, -vec.y));
-				} else if (this.prevCursorPos.y > mouseY) {
-					this.getBoundingBox().addVelocity(new Vec2i(0, -vec.y));
-				}
-
-			}
 			// Resolve the collisions with static objects
 			boolean outerCol = this.resolveStaticCollisions();
 
 			// Resolve the collisions with draggable objects
 			boolean objCol = this.resolveObjectCollisions();
 
-			List<BoundingBox2D> widgetBoundingBoxes = new ArrayList<BoundingBox2D>();
-			// Add all bounding boxes to a list, not including this one.
-			this.parentScreen.widgets.forEach(i -> {
-				if (i != this)
-					widgetBoundingBoxes.add(i.getBoundingBox());
-			});
+			List<BoundingBox2D> widgetBoundingBoxes = this.getWidgetBounds();
+//			List<BoundingBox2D> widgetBoundingBoxes = new ArrayList<BoundingBox2D>();
+//			// Add all bounding boxes to a list, not including this one.
+//			this.parentScreen.widgets.forEach(i -> {
+//				if (i != this)
+//					widgetBoundingBoxes.add(i.getBoundingBox());
+//			});
 
 //			--------------------------------------------------------
 			// Check for collisions against all objects
@@ -278,43 +306,45 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> {
 		this.parentScreen = screen;
 	}
 
+	public BoundingBox2D getCursorBoundingBox() {
+		return this.cursorBoundingBox;
+	}
+
 	protected void moveToDefaultPosition() {
 		if (this.defaultPosition != null && this.isEnabled()) {
 			this.getBoundingBox().setPos(this.defaultPosition.apply(this.parentScreen));
 		}
 	}
 
-	public static CompoundNBT serializeNBT(DraggableWidget widget) {
+	@Override
+	public CompoundNBT serializeNBT() {
 		CompoundNBT nbt = new CompoundNBT();
-		nbt.putString("id", widget.getRegistryName().toString());
-		nbt.putInt("x", widget.getBoundingBox().getPos().x);
-		nbt.putInt("y", widget.getBoundingBox().getPos().y);
-		nbt.putInt("width", widget.getBoundingBox().getWidth());
-		nbt.putInt("height", widget.getBoundingBox().getHeight());
-		nbt.putBoolean("enabled", widget.isEnabled());
-
+		nbt.putString("id", this.getRegistryName().toString());
+		nbt.put("boundingbox", this.getBoundingBox().serializeNBT());
+		nbt.putBoolean("enabled", this.isEnabled());
 		return nbt;
 	}
 
-	public static DraggableWidget deserializeNBT(CompoundNBT nbt) {
+	@Override
+	public void deserializeNBT(CompoundNBT nbt) {
+		// Empty
+	}
+
+	public static DraggableWidget read(CompoundNBT nbt) {
 		ResourceLocation id = new ResourceLocation(nbt.getString("id"));
-		int x = nbt.getInt("x");
-		int y = nbt.getInt("y");
-		int width = nbt.getInt("width");
-		int height = nbt.getInt("height");
+		BoundingBox2D box = BoundingBox2D.read((CompoundNBT) nbt.get("boundingbox"));
 		boolean enabled = nbt.getBoolean("enabled");
 		for (Entry<ResourceLocation, DraggableWidget> entry : GameRegistry.findRegistry(DraggableWidget.class)
 				.getEntries()) {
 			if (entry.getKey().equals(id)) {
 				DraggableWidget widget = entry.getValue();
-				widget.getBoundingBox().setPos(new Vec2i(x, y));
-				widget.getBoundingBox().setWidth(width);
-				widget.getBoundingBox().setHeight(height);
+				widget.getBoundingBox().setPos(box.getPos());
+				widget.getBoundingBox().setWidth(box.getWidth());
+				widget.getBoundingBox().setHeight(box.getHeight());
 				widget.setEnabled(enabled);
 				return widget;
 			}
 		}
-		return new DraggableWidget(new Vec2i(x, y), width, height);
+		return new DraggableWidget(box);
 	}
-
 }

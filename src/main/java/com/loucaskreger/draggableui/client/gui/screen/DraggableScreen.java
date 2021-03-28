@@ -37,7 +37,6 @@ public class DraggableScreen extends Screen {
 		this.height = mc.getMainWindow().getScaledHeight();
 		this.width = mc.getMainWindow().getScaledWidth();
 
-		System.out.println(WidgetManager.INSTANCE.widgets.size());
 		if (WidgetManager.INSTANCE.isDirty()) {
 			WidgetManager.INSTANCE.loadWidgets();
 		}
@@ -57,27 +56,12 @@ public class DraggableScreen extends Screen {
 				this.widgets.add(i);
 			});
 		}
-//		if (!moreWidgets.isEmpty()) {
-//			this.widgets.addAll(moreWidgets);
-//		}
-
-//		if (something != null) {
-//			System.out.println("Inside Here");
-//			something.setScreen(this);
-//			something.setEnabled(true);
-//			something.getBoundingBox().setVisible(true);
-//			something.getBoundingBox().setPos(new Vec2i(0, 0));
-////			something.getBoundingBox().setWidth(182);
-//			something.getBoundingBox().setColor(new Color4f(0f, 0.48f, 0.35f, 1f));
-//			this.widgets.add(something);
-//		}
-//		System.out.println(this.widgets.size());
 
 		this.interiorBounds = new BoundingBox2D(new Vec2i(0, 0), this.width, this.height);
 
 		// Bottom Bound
 		this.staticWidgets.add(new BoundingBox2D(interiorBounds.getPos().add(0, interiorBounds.getHeight() + 1),
-				interiorBounds.getWidth(), 5));
+				interiorBounds.getWidth(), 10));
 		// Top Bound
 		this.staticWidgets.add(new BoundingBox2D(interiorBounds.getPos().subtract(0, 6), interiorBounds.getWidth(), 5));
 		// Left Bound
@@ -90,11 +74,11 @@ public class DraggableScreen extends Screen {
 		int crosshairSize = 9;
 		// Vertical crosshair bound
 		this.staticWidgets.add(new BoundingBox2D(
-				new Vec2i(this.width % 2 != 0 ? (this.width / 2) : (this.width / 2) - 1, (this.height / 2) - 5), 1,
+				new Vec2i(this.width % 2 != 0 ? (this.width / 2) : (this.width / 2) - 1, (this.height / 2) - 4), 1,
 				crosshairSize));
 		// Horizontal crosshair bound
 		this.staticWidgets.add(new BoundingBox2D(
-				new Vec2i(this.width % 2 != 0 ? (this.width / 2) - 4 : (this.width / 2) - 5, (this.height / 2) - 1),
+				new Vec2i(this.width % 2 != 0 ? (this.width / 2) - 4 : (this.width / 2) - 5, (this.height / 2)),
 				crosshairSize, 1));
 
 	}
@@ -146,10 +130,11 @@ public class DraggableScreen extends Screen {
 	@Override
 	public void render(int mouseX, int mouseY, float partialTicks) {
 		this.widgets.forEach(i -> {
-//			i.getBoundingBox().setVisible(true);
+			i.getBoundingBox().setVisible(true);
 			i.render(mouseX, mouseY, partialTicks, this);
 		});
 		this.staticWidgets.forEach(i -> {
+			i.setVisible(true);
 			i.drawBoundingBoxOutline();
 		});
 

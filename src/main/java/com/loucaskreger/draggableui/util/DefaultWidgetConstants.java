@@ -26,6 +26,10 @@ public class DefaultWidgetConstants {
 	public static Function<Screen, Vec2i> getExperiencePos() {
 		return (screen) -> new Vec2i((screen.width / 2) - 91, screen.height - 29);
 	}
+	
+	public static Function<Screen, Vec2i> getExperienceLevelPos() {
+		return (screen) -> new Vec2i((screen.width / 2) - 5, screen.height - 36);
+	}
 
 	public static final int HUNGER_WIDTH = 81;
 	public static final int HUNGER_HEIGHT = 9;

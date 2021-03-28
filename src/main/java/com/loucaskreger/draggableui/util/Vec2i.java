@@ -1,6 +1,9 @@
 package com.loucaskreger.draggableui.util;
 
-public class Vec2i {
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraftforge.common.util.INBTSerializable;
+
+public class Vec2i implements INBTSerializable<CompoundNBT> {
 	public static final Vec2i ZERO = new Vec2i(0, 0);
 	public static final Vec2i ONE = new Vec2i(1, 1);
 	public static final Vec2i UNIT_X = new Vec2i(1, 0);
@@ -19,6 +22,11 @@ public class Vec2i {
 
 	public Vec2i(double xIn, double yIn) {
 		this((int) Math.round(xIn), (int) Math.round(yIn));
+	}
+
+	Vec2i(CompoundNBT nbt) {
+		this.x = nbt.getInt("x");
+		this.y = nbt.getInt("y");
 	}
 
 	public boolean equals(Vec2i other) {
@@ -52,6 +60,23 @@ public class Vec2i {
 
 	public Vec2i multiplyBy(int x, int y) {
 		return new Vec2i(this.x + x, this.y + y);
+	}
+
+	@Override
+	public CompoundNBT serializeNBT() {
+		CompoundNBT nbt = new CompoundNBT();
+		nbt.putInt("x", this.x);
+		nbt.putInt("y", this.y);
+		return nbt;
+	}
+
+	@Override
+	public void deserializeNBT(CompoundNBT nbt) {
+		// Empty
+	}
+
+	public static Vec2i read(CompoundNBT nbt) {
+		return new Vec2i(nbt);
 	}
 
 }

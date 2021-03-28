@@ -2,6 +2,7 @@ package com.loucaskreger.draggableui;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.loucaskreger.draggableui.client.gui.GuiRenderer;
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
 import com.loucaskreger.draggableui.init.WidgetRegistry;
 import com.loucaskreger.draggableui.util.WidgetManager;
@@ -39,7 +40,7 @@ public class DraggableUI {
 	}
 
 	private void setupClient(final FMLClientSetupEvent event) {
-		ClientRegistry.registerKeyBinding(EventSubscriber.key);
+		ClientRegistry.registerKeyBinding(GuiRenderer.key);
 		WidgetManager.INSTANCE.loadWidgets();
 	}
 

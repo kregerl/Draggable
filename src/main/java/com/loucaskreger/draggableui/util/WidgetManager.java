@@ -48,7 +48,7 @@ public class WidgetManager {
 				ListNBT list = (ListNBT) nbt.get(LIST_KEY);
 				for (int i = 0; i < list.size(); i++) {
 					CompoundNBT tag = list.getCompound(i);
-					widgets.add(DraggableWidget.deserializeNBT(tag));
+					widgets.add(DraggableWidget.read(tag));
 				}
 			} catch (IOException e) {
 				DraggableUI.LOGGER.error(e);
@@ -62,7 +62,7 @@ public class WidgetManager {
 		CompoundNBT parent = new CompoundNBT();
 		ListNBT nbt = new ListNBT();
 		for (DraggableWidget widget : widgets) {
-			nbt.add(DraggableWidget.serializeNBT(widget));
+			nbt.add(widget.serializeNBT());
 		}
 		parent.put(LIST_KEY, nbt);
 		FileOutputStream fileoutputstream;
