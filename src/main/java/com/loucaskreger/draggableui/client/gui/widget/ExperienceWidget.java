@@ -14,7 +14,7 @@ public class ExperienceWidget extends LinkedWidget {
 
 	public ExperienceWidget() {
 		super(0, 0, DefaultWidgetConstants.EXPERIENCE_WIDTH, DefaultWidgetConstants.EXPERIENCE_HEIGHT,
-				WidgetRegistry.EXPERIENCE_LEVEL_WIDGET);
+				WidgetRegistry.EXPERIENCE_LEVEL_WIDGET, WidgetRegistry.EXP_WIDGET.get());
 		this.defaultPosition = DefaultWidgetConstants.getExperiencePos();
 	}
 
@@ -48,6 +48,7 @@ public class ExperienceWidget extends LinkedWidget {
 						mc.getMainWindow().getScaledWidth(), mc.getMainWindow().getScaledHeight(), screen);
 			}
 		}
+		
 	}
 
 	@Override
