@@ -23,7 +23,14 @@ public class ExperienceLevelWidget extends DraggableWidget {
 			this.setLinked(false);
 		}
 	}
-	
+
+	@Override
+	protected void moveCursorBounds(Vec2i offset) {
+		if (this.getCursorBoundingBox() != null) {
+			this.getCursorBoundingBox().setPos(this.cursorPos.subtract(offset));
+			this.getCursorBoundingBox().setVisible(true);
+		}
+	}
 
 	@Override
 	// make this better so it renders based on the text being displayed.
@@ -33,11 +40,12 @@ public class ExperienceLevelWidget extends DraggableWidget {
 			GuiRenderer.renderExpBarLevel(this.getBoundingBox().getPos().x, this.getBoundingBox().getPos().y + 8);
 		}
 	}
-	
+
 	@Override
 	public void mouseReleased() {
 		super.mouseReleased();
-		// check for boundingboxes that cursor pos is within and if the widget is a linked widget, link them
+		// check for boundingboxes that cursor pos is within and if the widget is a
+		// linked widget, link them
 	}
 
 	public boolean isLinked() {

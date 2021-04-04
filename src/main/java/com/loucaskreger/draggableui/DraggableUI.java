@@ -45,6 +45,7 @@ public class DraggableUI {
 	}
 
 	private void newRegistryEvent(final RegistryEvent.NewRegistry event) {
+		@SuppressWarnings("unused")
 		IForgeRegistry<DraggableWidget> registry = new RegistryBuilder<DraggableWidget>().setType(DraggableWidget.class)
 				.setName(new ResourceLocation(DraggableUI.MOD_ID, "widgets")).create();
 	}

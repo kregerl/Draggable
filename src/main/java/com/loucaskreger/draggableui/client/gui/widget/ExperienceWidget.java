@@ -26,12 +26,6 @@ public class ExperienceWidget extends LinkedWidget {
 	}
 
 	@Override
-	public void mouseDragged(int mouseX, int mouseY) {
-		super.mouseDragged(mouseX, mouseY);
-
-	}
-
-	@Override
 	public void render(int mouseX, int mouseY, float partialTicks, AbstractGui screen) {
 		super.render(mouseX, mouseY, partialTicks, screen);
 		if (this.isEnabled()) {

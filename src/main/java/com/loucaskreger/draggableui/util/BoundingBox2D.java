@@ -12,7 +12,9 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public class BoundingBox2D implements INBTSerializable<CompoundNBT> {
-
+	
+	public static final Color4f DEFAULT_COLOR = new Color4f(1f, 0f, 0f, 1f);
+	
 	private Vec2i pos;
 	private Vec2i velocity;
 	private int width;
@@ -30,7 +32,7 @@ public class BoundingBox2D implements INBTSerializable<CompoundNBT> {
 	}
 
 	public BoundingBox2D(Vec2i pos, int width, int height) {
-		this(pos, width, height, new Color4f(1f, 0f, 0f, 1f));
+		this(pos, width, height, DEFAULT_COLOR);
 	}
 
 	BoundingBox2D(CompoundNBT nbt) {

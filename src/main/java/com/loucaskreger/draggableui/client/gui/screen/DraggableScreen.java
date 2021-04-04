@@ -1,13 +1,18 @@
 package com.loucaskreger.draggableui.client.gui.screen;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_K;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
-import com.loucaskreger.draggableui.client.gui.widget.HealthWidget;
+import com.loucaskreger.draggableui.client.gui.widget.LinkedWidget;
 import com.loucaskreger.draggableui.util.BoundingBox2D;
+import com.loucaskreger.draggableui.util.Color4f;
 import com.loucaskreger.draggableui.util.Vec2i;
 import com.loucaskreger.draggableui.util.WidgetManager;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.ITextComponent;
@@ -165,8 +170,30 @@ public class DraggableScreen extends Screen {
 		if (super.keyPressed(keyCode, scanCode, modifiers) || keyCode == GLFW_KEY_K) {
 			this.onClose();
 		}
+		if (keyCode == GLFW_KEY_LEFT_SHIFT) {
+			for (DraggableWidget widget : this.widgets) {
+				if (widget instanceof LinkedWidget) {
+					widget.getBoundingBox().setColor(new Color4f(0.4f, 1, 0.2f, 1.0f));
+					widget.getBoundingBox().setVisible(true);
+				}
+			}
+		}
+
 		return true;
 
+	}
+	
+	@Override
+	public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+		if (keyCode == GLFW_KEY_LEFT_SHIFT) {
+			for (DraggableWidget widget : this.widgets) {
+				if (widget instanceof LinkedWidget && widget.getBoundingBox().isVisible()) {
+					widget.getBoundingBox().setColor(BoundingBox2D.DEFAULT_COLOR);
+					widget.getBoundingBox().setVisible(false);
+				}
+			}
+		}
+		return true;
 	}
 
 }

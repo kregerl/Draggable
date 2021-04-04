@@ -4,17 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Function;
-
 import javax.annotation.Nullable;
-
 import com.loucaskreger.draggableui.client.gui.screen.DraggableScreen;
 import com.loucaskreger.draggableui.util.BoundingBox2D;
 import com.loucaskreger.draggableui.util.Color4f;
 import com.loucaskreger.draggableui.util.Vec2i;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.nbt.CompoundNBT;
@@ -103,9 +97,9 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 		this.cursorPos = new Vec2i(mouseX, mouseY);
 	}
 
-	protected void moveCursorBounds() {
+	protected void moveCursorBounds(Vec2i offset) {
 		if (this.cursorBoundingBox != null) {
-			this.cursorBoundingBox.setPos(this.cursorPos.subtract(this.mouseOffset));
+			this.cursorBoundingBox.setPos(this.cursorPos.subtract(offset));
 			this.cursorBoundingBox.setVisible(true);
 		}
 	}
@@ -145,51 +139,46 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	public void mouseDragged(int mouseX, int mouseY) {
 		if (this.isSelected() && this.parentScreen != null) {
 			this.updateCursorPositions(mouseX, mouseY);
-			this.moveCursorBounds();
-			this.move();
+			this.moveCursorBounds(this.mouseOffset);
+			// Apply velocity based on mouse cursor position
+			Vec2i velocity = this.getCursorVelocity();
+			this.getBoundingBox().addVelocity(velocity);
+
+			// Resolve the collisions with static objects
+			boolean outerCol = this.resolveStaticCollisions();
+
+			// Resolve the collisions with draggable objects
+			boolean objCol = this.resolveObjectCollisions();
+
+			List<BoundingBox2D> widgetBoundingBoxes = this.getWidgetBounds();
+
+//			--------------------------------------------------------
+			// Check for collisions against all objects
+			if ((outerCol || objCol) && !this.cursorBoundingBox.collidesAny(widgetBoundingBoxes)
+					&& !this.cursorBoundingBox.collidesAny(this.parentScreen.staticWidgets)
+					&& !this.cursorBoundingBox.isWithinAny(widgetBoundingBoxes)) {
+				this.getBoundingBox().setVelocity(
+						this.cursorPos.subtract(this.mouseOffset).subtract(this.getBoundingBox().getPos()));
+			}
+			// Store the new bounding box pos for later.
+			Vec2i finalPos = this.getBoundingBox().getPos().add(this.getBoundingBox().getVelocity());
+			/*
+			 * Simulate the collisions of a replica bounding box when the cursor's bounding
+			 * box and the widget's bounding box are not in the same place. The cursor must
+			 * be in a valid position.
+			 */
+			BoundingBox2D simulatedBoundingBox = new BoundingBox2D(finalPos, this.getBoundingBox().getWidth(),
+					this.getBoundingBox().getHeight());
+			if (!this.cursorBoundingBox.equals(simulatedBoundingBox)
+					&& !this.cursorBoundingBox.collidesAny(widgetBoundingBoxes)
+					&& !this.cursorBoundingBox.collidesAny(this.parentScreen.staticWidgets)
+					&& !this.cursorBoundingBox.isWithinAny(widgetBoundingBoxes)) {
+				finalPos = this.cursorPos.subtract(this.mouseOffset);
+			}
+
+			this.getBoundingBox().setPos(finalPos);
+			this.getBoundingBox().setVelocity(Vec2i.ZERO);
 		}
-	}
-
-	public void move() {
-		// Apply velocity based on mouse cursor position
-		Vec2i velocity = this.getCursorVelocity();
-		this.getBoundingBox().addVelocity(velocity);
-
-		// Resolve the collisions with static objects
-		boolean outerCol = this.resolveStaticCollisions();
-
-		// Resolve the collisions with draggable objects
-		boolean objCol = this.resolveObjectCollisions();
-
-		List<BoundingBox2D> widgetBoundingBoxes = this.getWidgetBounds();
-
-//		--------------------------------------------------------
-		// Check for collisions against all objects
-		if ((outerCol || objCol) && !this.cursorBoundingBox.collidesAny(widgetBoundingBoxes)
-				&& !this.cursorBoundingBox.collidesAny(this.parentScreen.staticWidgets)
-				&& !this.cursorBoundingBox.isWithinAny(widgetBoundingBoxes)) {
-			this.getBoundingBox()
-					.setVelocity(this.cursorPos.subtract(this.mouseOffset).subtract(this.getBoundingBox().getPos()));
-		}
-		// Store the new bounding box pos for later.
-		Vec2i finalPos = this.getBoundingBox().getPos().add(this.getBoundingBox().getVelocity());
-		/*
-		 * Simulate the collisions of a replica bounding box when the cursor's bounding
-		 * box and the widget's bounding box are not in the same place. The cursor must
-		 * be in a valid position.
-		 */
-		BoundingBox2D simulatedBoundingBox = new BoundingBox2D(finalPos, this.getBoundingBox().getWidth(),
-				this.getBoundingBox().getHeight());
-		if (!this.cursorBoundingBox.equals(simulatedBoundingBox)
-				&& !this.cursorBoundingBox.collidesAny(widgetBoundingBoxes)
-				&& !this.cursorBoundingBox.collidesAny(this.parentScreen.staticWidgets)
-				&& !this.cursorBoundingBox.isWithinAny(widgetBoundingBoxes)) {
-			finalPos = this.cursorPos.subtract(this.mouseOffset);
-		}
-
-		this.getBoundingBox().setPos(finalPos);
-		this.getBoundingBox().setVelocity(Vec2i.ZERO);
-
 	}
 
 	/*
@@ -313,6 +302,10 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 
 	public BoundingBox2D getCursorBoundingBox() {
 		return this.cursorBoundingBox;
+	}
+
+	public void setMouseOffset(Vec2i offset) {
+		this.mouseOffset = offset;
 	}
 
 	protected void moveToDefaultPosition() {

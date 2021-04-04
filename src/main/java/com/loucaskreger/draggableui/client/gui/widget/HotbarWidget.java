@@ -31,7 +31,7 @@ public class HotbarWidget extends DraggableWidget {
 			RenderSystem.enableBlend();
 			GuiRenderer.renderHotbar(this.getBoundingBox().getPos().x, this.getBoundingBox().getPos().y, partialTicks,
 					mc.getMainWindow().getScaledWidth(), mc.getMainWindow().getScaledHeight(), screen,
-					this.parentScreen == null);
+					screen == mc.ingameGUI);
 
 			GuiRenderer.renderSelectedItem(mc.player.getHeldItemMainhand(), this.getBoundingBox().getPos().x,
 					this.getBoundingBox().getPos().y, mc.getMainWindow().getScaledWidth(),

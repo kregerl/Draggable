@@ -9,10 +9,6 @@ import com.loucaskreger.draggableui.util.Vec2i;
 
 public class LinkedWidget extends DraggableWidget {
 
-	/**
-	 * TODO:
-	 * - Update the collisions so the linked widget also collides with unselected objects and static colliders.
-	 */
 	protected Supplier<DraggableWidget> linkedWidget;
 	private Vec2i offset;
 	protected boolean linked;
@@ -43,23 +39,50 @@ public class LinkedWidget extends DraggableWidget {
 	}
 
 	public void updateOffset() {
-		this.offset = this.getBoundingBox().getPos().subtract(this.linkedWidget.get().getBoundingBox().getPos());
+		this.offset = this.cursorPos.subtract(this.linkedWidget.get().getBoundingBox().getPos());
 	}
-	
 
 	@Override
 	public void mouseDragged(int mouseX, int mouseY) {
+		super.mouseDragged(mouseX, mouseY);
 		if (this.linked && this.isSelected()) {
 			this.linkedWidget.get().updateCursorPositions(mouseX, mouseY);
-			this.linkedWidget.get().moveCursorBounds();
-			this.linkedWidget.get().move();
-//			Vec2i velocity = this.getCursorVelocity();
-//			Vec2i finalPos = this.linkedWidget.get().getBoundingBox().getPos().add(velocity);
-//			this.linkedWidget.get().resolveStaticCollisions();
-////			this.linkedWidget.get().resolveObjectCollisions();
-//			this.linkedWidget.get().getBoundingBox().setPos(finalPos);
+			this.linkedWidget.get().moveCursorBounds(this.offset);
+			BoundingBox2D linkedWidgetBox = this.linkedWidget.get().getBoundingBox();
+
+			this.linkedWidget.get().getBoundingBox().setVelocity(this.getCursorVelocity());
+
+			boolean resStatic = this.linkedWidget.get().resolveStaticCollisions();
+			boolean resDynamic = this.linkedWidget.get().resolveObjectCollisions();
+
+			List<BoundingBox2D> widgetBoundingBoxes = this.getWidgetBounds();
+
+			if ((resStatic || resDynamic) && !linkedWidgetBox.collidesAny(widgetBoundingBoxes)
+					&& !linkedWidgetBox.collidesAny(this.parentScreen.staticWidgets)
+					&& !linkedWidgetBox.isWithinAny(widgetBoundingBoxes)) {
+
+				linkedWidgetBox.setVelocity(this.cursorPos.subtract(this.offset).subtract(linkedWidgetBox.getPos()));
+			}
+
+			Vec2i finalPos = this.linkedWidget.get().getBoundingBox().getPos()
+					.add(this.linkedWidget.get().getBoundingBox().getVelocity());
+
+			BoundingBox2D simulatedBoundingBox = new BoundingBox2D(finalPos, linkedWidgetBox.getWidth(),
+					linkedWidgetBox.getHeight());
+
+			// LinkedWidgetBox here should be the cursorboundingBox instead .
+			if (!this.linkedWidget.get().getCursorBoundingBox().equals(simulatedBoundingBox)
+					&& !this.linkedWidget.get().getCursorBoundingBox().collidesAny(widgetBoundingBoxes)
+					&& !this.linkedWidget.get().getCursorBoundingBox().collidesAny(this.parentScreen.staticWidgets)
+					&& !this.linkedWidget.get().getCursorBoundingBox().isWithinAny(widgetBoundingBoxes)) {
+				System.out.println("Here");
+				finalPos = this.cursorPos.subtract(this.offset);
+			}
+
+			this.linkedWidget.get().getBoundingBox().setPos(finalPos);
+			this.linkedWidget.get().getBoundingBox().setVelocity(Vec2i.ZERO);
+
 		}
-		super.mouseDragged(mouseX, mouseY);
 	}
 
 	@Override
