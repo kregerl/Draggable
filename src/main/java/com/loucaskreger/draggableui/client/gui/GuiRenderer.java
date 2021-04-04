@@ -204,14 +204,14 @@ public class GuiRenderer {
 			s = highlightingItemStack.getHighlightTip(s);
 			int i = x + (182 / 2) - mc.fontRenderer.getStringWidth(s) / 2;
 			int j = y - 37;
-			System.out.println(j);
+//			System.out.println(j);
 			if (j <= 0) {
 				j -= j - 1;
 				if (y == 0) {
 					j += 22;
 				}
 			}
-			System.out.println(j);
+//			System.out.println(j);
 			if (!mc.playerController.shouldDrawHUD()) {
 				j += 14;
 			}

@@ -2,6 +2,7 @@ package com.loucaskreger.draggableui.client.gui.widget;
 
 import com.loucaskreger.draggableui.client.gui.GuiRenderer;
 import com.loucaskreger.draggableui.util.DefaultWidgetConstants;
+import com.loucaskreger.draggableui.util.Vec2i;
 
 import net.minecraft.client.gui.AbstractGui;
 
@@ -22,6 +23,7 @@ public class ExperienceLevelWidget extends DraggableWidget {
 			this.setLinked(false);
 		}
 	}
+	
 
 	@Override
 	// make this better so it renders based on the text being displayed.
@@ -30,6 +32,12 @@ public class ExperienceLevelWidget extends DraggableWidget {
 		if (this.isEnabled()) {
 			GuiRenderer.renderExpBarLevel(this.getBoundingBox().getPos().x, this.getBoundingBox().getPos().y + 8);
 		}
+	}
+	
+	@Override
+	public void mouseReleased() {
+		super.mouseReleased();
+		// check for boundingboxes that cursor pos is within and if the widget is a linked widget, link them
 	}
 
 	public boolean isLinked() {

@@ -49,8 +49,8 @@ public class DraggableScreen extends Screen {
 		if (WidgetManager.INSTANCE.widgets.isEmpty()) {
 			IForgeRegistry<DraggableWidget> registry = GameRegistry.findRegistry(DraggableWidget.class);
 			registry.forEach(i -> {
-				System.out.println("Registry Name: " + i.getRegistryName());
-				System.out.println(i instanceof HealthWidget);
+//				System.out.println("Registry Name: " + i.getRegistryName());
+//				System.out.println(i instanceof HealthWidget);
 				i.setScreen(this);
 				i.setEnabled(true);
 				this.widgets.add(i);

@@ -3,7 +3,6 @@ package com.loucaskreger.draggableui.client.gui.widget;
 import com.loucaskreger.draggableui.client.gui.GuiRenderer;
 import com.loucaskreger.draggableui.init.WidgetRegistry;
 import com.loucaskreger.draggableui.util.DefaultWidgetConstants;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraftforge.client.gui.ForgeIngameGui;
@@ -14,7 +13,7 @@ public class ExperienceWidget extends LinkedWidget {
 
 	public ExperienceWidget() {
 		super(0, 0, DefaultWidgetConstants.EXPERIENCE_WIDTH, DefaultWidgetConstants.EXPERIENCE_HEIGHT,
-				WidgetRegistry.EXPERIENCE_LEVEL_WIDGET, WidgetRegistry.EXP_WIDGET.get());
+				WidgetRegistry.EXPERIENCE_LEVEL_WIDGET);
 		this.defaultPosition = DefaultWidgetConstants.getExperiencePos();
 	}
 
@@ -29,10 +28,6 @@ public class ExperienceWidget extends LinkedWidget {
 	@Override
 	public void mouseDragged(int mouseX, int mouseY) {
 		super.mouseDragged(mouseX, mouseY);
-		if (this.linked) {
-			this.linkedWidget.get().getBoundingBox().setPos(this.linkedWidget.get().getBoundingBox().getPos()
-					.add((this.getBoundingBox().getWidth() - 12) / 2, -7));
-		}
 
 	}
 
@@ -48,7 +43,7 @@ public class ExperienceWidget extends LinkedWidget {
 						mc.getMainWindow().getScaledWidth(), mc.getMainWindow().getScaledHeight(), screen);
 			}
 		}
-		
+
 	}
 
 	@Override

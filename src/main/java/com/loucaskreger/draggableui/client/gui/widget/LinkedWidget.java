@@ -9,27 +9,23 @@ import com.loucaskreger.draggableui.util.Vec2i;
 
 public class LinkedWidget extends DraggableWidget {
 
-	// Change to linkingWidget and linkableWidget to change all of mouseClicked when
-	// a linkableWidget is linked to a linking widget.
+	/**
+	 * TODO:
+	 * - Update the collisions so the linked widget also collides with unselected objects and static colliders.
+	 */
 	protected Supplier<DraggableWidget> linkedWidget;
 	private Vec2i offset;
 	protected boolean linked;
 
-	public LinkedWidget(int x, int y, int width, int height, Supplier<DraggableWidget> linkedWidget, DraggableWidget thisWidget) {
+	public LinkedWidget(int x, int y, int width, int height, Supplier<DraggableWidget> linkedWidget) {
 		super(x, y, width, height);
 		this.offset = null;
 		this.linkedWidget = linkedWidget;
 		this.linked = true;
 	}
 
-	public LinkedWidget(Vec2i pos, int width, int height, Supplier<DraggableWidget> linkedWidget, DraggableWidget thisWidget) {
-		this(pos.x, pos.y, width, height, linkedWidget, thisWidget);
-	}
-
-	public void updateOffset() {
-		System.out.println(this.linkedWidget.get().getBoundingBox().getPos());
-		this.offset = this.getBoundingBox().getPos().subtract(this.linkedWidget.get().getBoundingBox().getPos());
-
+	public LinkedWidget(Vec2i pos, int width, int height, Supplier<DraggableWidget> linkedWidget) {
+		this(pos.x, pos.y, width, height, linkedWidget);
 	}
 
 	@Override
@@ -41,23 +37,30 @@ public class LinkedWidget extends DraggableWidget {
 				&& mouseY < this.getBoundingBox().getPos().y + this.getBoundingBox().getHeight();
 
 		if (isInBoundsX && isInBoundsY) {
-			this.linkedWidget.get().setSelected(true);
 			this.updateOffset();
 			this.linked = true;
 		}
 	}
 
-//	@Override
-//	public void mouseDragged(int mouseX, int mouseY) {
-//		super.mouseDragged(mouseX, mouseY);
-//		if (this.linked) {
-//			this.updateOffset();
-//			if (this.offset != null) {
-////				BoundingBox2D widgetBox = this.linkedWidget.get().getBoundingBox();
-////				widgetBox.setPos(widgetBox.getPos().add(this.offset));
-//			}
-//		}
-//	}
+	public void updateOffset() {
+		this.offset = this.getBoundingBox().getPos().subtract(this.linkedWidget.get().getBoundingBox().getPos());
+	}
+	
+
+	@Override
+	public void mouseDragged(int mouseX, int mouseY) {
+		if (this.linked && this.isSelected()) {
+			this.linkedWidget.get().updateCursorPositions(mouseX, mouseY);
+			this.linkedWidget.get().moveCursorBounds();
+			this.linkedWidget.get().move();
+//			Vec2i velocity = this.getCursorVelocity();
+//			Vec2i finalPos = this.linkedWidget.get().getBoundingBox().getPos().add(velocity);
+//			this.linkedWidget.get().resolveStaticCollisions();
+////			this.linkedWidget.get().resolveObjectCollisions();
+//			this.linkedWidget.get().getBoundingBox().setPos(finalPos);
+		}
+		super.mouseDragged(mouseX, mouseY);
+	}
 
 	@Override
 	protected List<BoundingBox2D> getWidgetBounds() {
@@ -72,6 +75,10 @@ public class LinkedWidget extends DraggableWidget {
 	@Override
 	public void onClose() {
 		super.onClose();
+	}
+
+	protected Vec2i getLinkingOffset() {
+		return this.offset;
 	}
 
 }

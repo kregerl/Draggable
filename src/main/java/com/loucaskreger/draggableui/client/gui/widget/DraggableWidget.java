@@ -28,8 +28,8 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	private BoundingBox2D boundingBox;
 	private BoundingBox2D cursorBoundingBox;
 	protected Vec2i mouseOffset;
-	private Vec2i cursorPos;
-	private Vec2i prevCursorPos;
+	protected Vec2i cursorPos;
+	protected Vec2i prevCursorPos;
 
 	private boolean isEnabled;
 	private boolean isSelected;
@@ -96,32 +96,41 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 				(int) Math.round(mouseY) - this.boundingBox.getPos().y);
 	}
 
-	private void updateCursorPositions(double mouseX, double mouseY) {
+	protected void updateCursorPositions(double mouseX, double mouseY) {
 		if (this.cursorPos != null) {
 			this.prevCursorPos = this.cursorPos;
 		}
 		this.cursorPos = new Vec2i(mouseX, mouseY);
 	}
 
-	protected Vec2i getCursorVelocity() {
-		Vec2i vec = this.prevCursorPos.subtract(this.cursorPos);
-		Vec2i result = Vec2i.ZERO;
-		System.out.println();
-		if (this.prevCursorPos != null) {
-			if (this.prevCursorPos.x < this.cursorPos.x) {
-				result = result.add(new Vec2i(-vec.x, 0));
-			} else if (this.prevCursorPos.x > this.cursorPos.x) {
-				result = result.add(new Vec2i(-vec.x, 0));
-			}
-
-			if (this.prevCursorPos.y < this.cursorPos.y) {
-				result = result.add(new Vec2i(0, -vec.y));
-			} else if (this.prevCursorPos.y > this.cursorPos.y) {
-				result = result.add(new Vec2i(0, -vec.y));
-			}
-
+	protected void moveCursorBounds() {
+		if (this.cursorBoundingBox != null) {
+			this.cursorBoundingBox.setPos(this.cursorPos.subtract(this.mouseOffset));
+			this.cursorBoundingBox.setVisible(true);
 		}
-		return result;
+	}
+
+	protected Vec2i getCursorVelocity() {
+		if (this.prevCursorPos != null && this.cursorPos != null) {
+			Vec2i vec = this.prevCursorPos.subtract(this.cursorPos);
+			Vec2i result = Vec2i.ZERO;
+			if (this.prevCursorPos != null) {
+				if (this.prevCursorPos.x < this.cursorPos.x) {
+					result = result.add(new Vec2i(-vec.x, 0));
+				} else if (this.prevCursorPos.x > this.cursorPos.x) {
+					result = result.add(new Vec2i(-vec.x, 0));
+				}
+
+				if (this.prevCursorPos.y < this.cursorPos.y) {
+					result = result.add(new Vec2i(0, -vec.y));
+				} else if (this.prevCursorPos.y > this.cursorPos.y) {
+					result = result.add(new Vec2i(0, -vec.y));
+				}
+
+			}
+			return result;
+		}
+		return Vec2i.ZERO;
 	}
 
 	protected List<BoundingBox2D> getWidgetBounds() {
@@ -136,16 +145,12 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	public void mouseDragged(int mouseX, int mouseY) {
 		if (this.isSelected() && this.parentScreen != null) {
 			this.updateCursorPositions(mouseX, mouseY);
+			this.moveCursorBounds();
 			this.move();
 		}
 	}
 
 	public void move() {
-
-		if (this.cursorBoundingBox != null) {
-			this.cursorBoundingBox.setPos(this.cursorPos.subtract(this.mouseOffset));
-			this.cursorBoundingBox.setVisible(true);
-		}
 		// Apply velocity based on mouse cursor position
 		Vec2i velocity = this.getCursorVelocity();
 		this.getBoundingBox().addVelocity(velocity);
@@ -241,6 +246,8 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 		this.getBoundingBox().setVelocity(Vec2i.ZERO);
 		this.setSelected(false);
 		this.cursorBoundingBox = null;
+		this.cursorPos = null;
+		this.prevCursorPos = null;
 	}
 
 	public void tick() {
