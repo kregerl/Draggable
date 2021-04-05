@@ -12,6 +12,10 @@ public class DefaultWidgetConstants {
 	public static Function<Screen, Vec2i> getHotbarPos() {
 		return (screen) -> new Vec2i((screen.width / 2) - 91, screen.height - 22);
 	}
+	
+	public static Function<Screen, Vec2i> getOffhandPos() {
+		return (screen) -> new Vec2i((screen.width / 2) - 120, screen.height - 22);
+	}
 
 	public static final int HEALTH_WIDTH = 81;
 	public static final int HEALTH_HEIGHT = 9;

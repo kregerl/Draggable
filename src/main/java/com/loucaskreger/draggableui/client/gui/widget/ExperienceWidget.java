@@ -7,7 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
-public class ExperienceWidget extends LinkedWidget {
+public class ExperienceWidget extends LinkingWidget {
 
 	private static final Minecraft mc = Minecraft.getInstance();
 
@@ -18,22 +18,14 @@ public class ExperienceWidget extends LinkedWidget {
 	}
 
 	@Override
-	public void tick() {
-		super.tick();
-		if (this.linkedWidget.get() instanceof ExperienceLevelWidget) {
-			this.linked = ((ExperienceLevelWidget) this.linkedWidget.get()).isLinked();
-		}
-	}
-
-	@Override
 	public void render(int mouseX, int mouseY, float partialTicks, AbstractGui screen) {
 		super.render(mouseX, mouseY, partialTicks, screen);
 		if (this.isEnabled()) {
 			if (this.parentScreen != null) {
-				GuiRenderer.renderExpBar(this.getBoundingBox().getPos().x, this.getBoundingBox().getPos().y,
+				GuiRenderer.Expbar.renderExpBar(this.getBoundingBox().getPos().x, this.getBoundingBox().getPos().y,
 						this.parentScreen.width, this.parentScreen.height, screen);
 			} else {
-				GuiRenderer.renderExpBar(this.getBoundingBox().getPos().x, this.getBoundingBox().getPos().y,
+				GuiRenderer.Expbar.renderExpBar(this.getBoundingBox().getPos().x, this.getBoundingBox().getPos().y,
 						mc.getMainWindow().getScaledWidth(), mc.getMainWindow().getScaledHeight(), screen);
 			}
 		}

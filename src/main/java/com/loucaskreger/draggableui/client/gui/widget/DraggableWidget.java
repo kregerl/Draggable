@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import com.loucaskreger.draggableui.client.gui.screen.DraggableScreen;
 import com.loucaskreger.draggableui.util.BoundingBox2D;
 import com.loucaskreger.draggableui.util.Color4f;
+import com.loucaskreger.draggableui.util.Util;
 import com.loucaskreger.draggableui.util.Vec2i;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
@@ -39,6 +40,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	 * widget.
 	 */
 	protected Function<Screen, Vec2i> defaultPosition;
+//	private Canvas background;
 
 	public DraggableWidget(int initialX, int initialY, int width, int height) {
 		this.boundingBox = new BoundingBox2D(new Vec2i(initialX, initialY), width, height);
@@ -68,12 +70,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 					this.getBoundingBox().getHeight(), new Color4f(0.25f, 0.25f, 0.88f, 1f));
 		}
 
-		boolean isInBoundsX = mouseX > this.boundingBox.getPos().x
-				&& mouseX < this.boundingBox.getPos().x + this.getBoundingBox().getWidth();
-		boolean isInBoundsY = mouseY > this.boundingBox.getPos().y
-				&& mouseY < this.boundingBox.getPos().y + this.getBoundingBox().getHeight();
-
-		if (isInBoundsX && isInBoundsY) {
+		if (Util.isWithinBounds(new Vec2i(mouseX, mouseY), this.getBoundingBox())) {
 			this.setSelected(true);
 			this.updatePosition((int) Math.round(mouseX), (int) Math.round(mouseY));
 		}

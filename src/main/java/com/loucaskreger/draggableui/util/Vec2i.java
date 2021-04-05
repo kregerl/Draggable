@@ -72,7 +72,7 @@ public class Vec2i implements INBTSerializable<CompoundNBT> {
 
 	@Override
 	public void deserializeNBT(CompoundNBT nbt) {
-		// Empty
+		// EMPTY  
 	}
 
 	public static Vec2i read(CompoundNBT nbt) {

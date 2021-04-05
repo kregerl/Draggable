@@ -16,7 +16,7 @@ import net.minecraftforge.fml.loading.FMLPaths;
 
 public class WidgetManager {
 
-	private static Path path = FMLPaths.GAMEDIR.get().resolve("draggableUI/state/state.nbt");
+	private static Path path = FMLPaths.GAMEDIR.get().resolve("draggableUI/state/save.nbt");
 	private static final String LIST_KEY = "list";
 	public static WidgetManager INSTANCE;
 	public List<DraggableWidget> widgets;

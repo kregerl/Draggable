@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
-import com.loucaskreger.draggableui.client.gui.widget.LinkedWidget;
+import com.loucaskreger.draggableui.client.gui.widget.LinkingWidget;
+import com.loucaskreger.draggableui.client.gui.widget.OffhandWidget;
 import com.loucaskreger.draggableui.util.BoundingBox2D;
 import com.loucaskreger.draggableui.util.Color4f;
 import com.loucaskreger.draggableui.util.Vec2i;
@@ -15,6 +16,8 @@ import com.loucaskreger.draggableui.util.WidgetManager;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.HandSide;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -23,9 +26,6 @@ import net.minecraftforge.registries.IForgeRegistry;
 public class DraggableScreen extends Screen {
 
 	private static final Minecraft mc = Minecraft.getInstance();
-
-	// Save data in .minecraft/something
-	// FMLPaths.GAMEDIR.get().resolve("mymod/data.nbt")
 
 	// Movable widgets
 	public List<DraggableWidget> widgets;
@@ -53,13 +53,13 @@ public class DraggableScreen extends Screen {
 		});
 		if (WidgetManager.INSTANCE.widgets.isEmpty()) {
 			IForgeRegistry<DraggableWidget> registry = GameRegistry.findRegistry(DraggableWidget.class);
-			registry.forEach(i -> {
-//				System.out.println("Registry Name: " + i.getRegistryName());
-//				System.out.println(i instanceof HealthWidget);
-				i.setScreen(this);
-				i.setEnabled(true);
-				this.widgets.add(i);
-			});
+			for (DraggableWidget widget : registry) {
+
+				widget.setScreen(this);
+				widget.setEnabled(true);
+				this.widgets.add(widget);
+			}
+
 		}
 
 		this.interiorBounds = new BoundingBox2D(new Vec2i(0, 0), this.width, this.height);
@@ -172,7 +172,7 @@ public class DraggableScreen extends Screen {
 		}
 		if (keyCode == GLFW_KEY_LEFT_SHIFT) {
 			for (DraggableWidget widget : this.widgets) {
-				if (widget instanceof LinkedWidget) {
+				if (widget instanceof LinkingWidget) {
 					widget.getBoundingBox().setColor(new Color4f(0.4f, 1, 0.2f, 1.0f));
 					widget.getBoundingBox().setVisible(true);
 				}
@@ -182,12 +182,12 @@ public class DraggableScreen extends Screen {
 		return true;
 
 	}
-	
+
 	@Override
 	public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
 		if (keyCode == GLFW_KEY_LEFT_SHIFT) {
 			for (DraggableWidget widget : this.widgets) {
-				if (widget instanceof LinkedWidget && widget.getBoundingBox().isVisible()) {
+				if (widget instanceof LinkingWidget && widget.getBoundingBox().isVisible()) {
 					widget.getBoundingBox().setColor(BoundingBox2D.DEFAULT_COLOR);
 					widget.getBoundingBox().setVisible(false);
 				}
