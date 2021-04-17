@@ -1,6 +1,8 @@
 package com.loucaskreger.draggableui.client.gui.widget;
 
+import java.util.Arrays;
 import com.loucaskreger.draggableui.client.gui.GuiRenderer;
+import com.loucaskreger.draggableui.init.RegistryNames;
 import com.loucaskreger.draggableui.init.WidgetRegistry;
 import com.loucaskreger.draggableui.util.DefaultWidgetConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -15,7 +17,8 @@ public class HotbarWidget extends LinkingWidget {
 
 	public HotbarWidget() {
 		super(0, 0, DefaultWidgetConstants.HOTBAR_WIDTH, DefaultWidgetConstants.HOTBAR_HEIGHT,
-				WidgetRegistry.OFFHAND_WIDGET/* Offhand Widgets and selected item text here. */);
+				Arrays.asList(WidgetRegistry.OFFHAND_WIDGET,
+						WidgetRegistry.SELECTED_ITEM_WIDGET)/* Offhand Widgets and selected item text here. */);
 		this.defaultPosition = DefaultWidgetConstants.getHotbarPos();
 
 	}
@@ -50,10 +53,18 @@ public class HotbarWidget extends LinkingWidget {
 	@Override
 	public void tick() {
 		super.tick();
-		if (!(mc.player.getHeldItemOffhand() == ItemStack.EMPTY)) {
-			this.linkedWidget.get().setEnabled(true);
-		} else {
-			this.linkedWidget.get().setEnabled(false);
+		if (this.linked) {
+			if (!(mc.player.getHeldItemOffhand() == ItemStack.EMPTY)) {
+				this.linkedWidgets.get(RegistryNames.OFFHAND_WIDGET.getResourceLocation()).get().setEnabled(true);
+			} else {
+				this.linkedWidgets.get(RegistryNames.OFFHAND_WIDGET.getResourceLocation()).get().setEnabled(false);
+			}
+			
+			if (!(mc.player.getHeldItemMainhand().isEmpty())) {
+				this.linkedWidgets.get(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation()).get().setEnabled(true);
+			} else {
+				this.linkedWidgets.get(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation()).get().setEnabled(false);
+			}
 		}
 	}
 }

@@ -9,6 +9,7 @@ import com.loucaskreger.draggableui.EventSubscriber;
 import com.loucaskreger.draggableui.client.gui.screen.DraggableScreen;
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
 import com.loucaskreger.draggableui.client.gui.widget.HotbarWidget;
+import com.loucaskreger.draggableui.client.gui.widget.SelectedItemTextWidget;
 import com.loucaskreger.draggableui.util.WidgetManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -25,7 +26,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -48,7 +48,7 @@ public class GuiRenderer {
 			}
 			List<DraggableWidget> widgets = WidgetManager.INSTANCE.getWidgets();
 			for (DraggableWidget widget : widgets) {
-				if (widget instanceof HotbarWidget) {
+				if (widget instanceof HotbarWidget || widget instanceof SelectedItemTextWidget) {
 					widget.tick();
 				}
 				widget.render(0, 0, 0, mc.ingameGUI);
@@ -59,7 +59,7 @@ public class GuiRenderer {
 	@SubscribeEvent
 	public static void onClientTick(final ClientTickEvent event) {
 		if (mc.player != null) {
-			ItemStack itemstack = mc.player.inventory.getCurrentItem();
+			ItemStack itemstack = mc.player.getHeldItemMainhand();
 			if (itemstack.isEmpty()) {
 				remainingHighlightTicks = 0;
 			} else if (!highlightingItemStack.isEmpty() && itemstack.getItem() == highlightingItemStack.getItem()
@@ -78,8 +78,6 @@ public class GuiRenderer {
 		}
 
 		if (key.isPressed()) {
-			ForgeIngameGui.left_height = 39;
-			ForgeIngameGui.right_height = 39;
 			EventSubscriber.shouldRenderDefaults = false;
 			DraggableScreen.open();
 		}
@@ -207,8 +205,11 @@ public class GuiRenderer {
 				}
 				String s = itextcomponent.getFormattedText();
 				s = highlightingItemStack.getHighlightTip(s);
-				int i = x + (182 / 2) - mc.fontRenderer.getStringWidth(s) / 2;
-				int j = y - 37;
+				int i = x;
+				int j = y;
+//				System.out.println(scaledWidth);
+//				System.out.println(scaledHeight);
+//				System.out.println(mc.fontRenderer.getStringWidth(s));
 				if (j <= 0) {
 					j -= j - 1;
 					if (y == 0) {
@@ -232,10 +233,10 @@ public class GuiRenderer {
 							mc.gameSettings.getChatBackgroundColor(0));
 					FontRenderer font = highlightingItemStack.getItem().getFontRenderer(highlightingItemStack);
 					if (font == null) {
-						mc.fontRenderer.drawStringWithShadow(s, (float) i, (float) j, 16777215 + (k << 24));
+						mc.fontRenderer.drawStringWithShadow(s, (float) i, (float) y, 16777215 + (k << 24));
 					} else {
-						i = (scaledWidth - font.getStringWidth(s)) / 2;
-						font.drawStringWithShadow(s, (float) i, (float) j, 16777215 + (k << 24));
+						i = (i + font.getStringWidth(s)) / 2;
+						font.drawStringWithShadow(s, (float) i, (float) y, 16777215 + (k << 24));
 					}
 					RenderSystem.disableBlend();
 					RenderSystem.popMatrix();

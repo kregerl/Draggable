@@ -1,5 +1,7 @@
 package com.loucaskreger.draggableui.client.gui.widget;
 
+import java.util.Arrays;
+
 import com.loucaskreger.draggableui.client.gui.GuiRenderer;
 import com.loucaskreger.draggableui.init.WidgetRegistry;
 import com.loucaskreger.draggableui.util.DefaultWidgetConstants;
@@ -13,7 +15,7 @@ public class ExperienceWidget extends LinkingWidget {
 
 	public ExperienceWidget() {
 		super(0, 0, DefaultWidgetConstants.EXPERIENCE_WIDTH, DefaultWidgetConstants.EXPERIENCE_HEIGHT,
-				WidgetRegistry.EXPERIENCE_LEVEL_WIDGET);
+				Arrays.asList(WidgetRegistry.EXPERIENCE_LEVEL_WIDGET));
 		this.defaultPosition = DefaultWidgetConstants.getExperiencePos();
 	}
 
@@ -40,7 +42,6 @@ public class ExperienceWidget extends LinkingWidget {
 	@Override
 	public void onClose() {
 		super.onClose();
-		ForgeIngameGui.renderExperiance = false;
 	}
 
 }

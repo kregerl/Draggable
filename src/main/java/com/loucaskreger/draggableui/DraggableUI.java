@@ -36,7 +36,7 @@ public class DraggableUI {
 	}
 
 	private void setupCommon(final FMLCommonSetupEvent event) {
-
+		
 	}
 
 	private void setupClient(final FMLClientSetupEvent event) {

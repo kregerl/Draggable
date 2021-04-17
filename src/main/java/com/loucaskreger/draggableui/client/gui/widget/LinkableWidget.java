@@ -9,6 +9,7 @@ public class LinkableWidget extends DraggableWidget {
 	protected static final Minecraft mc = Minecraft.getInstance();
 
 	private boolean isLinked;
+	private Vec2i offset;
 
 	public LinkableWidget(Vec2i pos, int width, int height) {
 		super(pos, width, height);
@@ -40,12 +41,24 @@ public class LinkableWidget extends DraggableWidget {
 		super.mouseReleased();
 	}
 
+	protected void updateOffset(Vec2i cursorPos) {
+		this.offset = cursorPos.subtract(this.getBoundingBox().getPos());
+	}
+
 	public boolean isLinked() {
 		return isLinked;
 	}
 
 	public void setLinked(boolean linked) {
 		this.isLinked = linked;
+	}
+
+	protected Vec2i getOffset() {
+		return offset;
+	}
+
+	protected void setOffset(Vec2i offset) {
+		this.offset = offset;
 	}
 
 }

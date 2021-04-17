@@ -1,6 +1,7 @@
 package com.loucaskreger.draggableui.client.gui.screen;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_K;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 
 import java.util.ArrayList;
@@ -178,6 +179,13 @@ public class DraggableScreen extends Screen {
 				}
 			}
 		}
+		
+		if (keyCode == GLFW_KEY_R) {
+			this.widgets.forEach(i -> {
+				i.setShouldMoveToDefaultPos(true);
+			});
+			
+		}
 
 		return true;
 
@@ -192,6 +200,13 @@ public class DraggableScreen extends Screen {
 					widget.getBoundingBox().setVisible(false);
 				}
 			}
+		}
+		
+		if (keyCode == GLFW_KEY_R) {
+			this.widgets.forEach(i -> {
+				i.setShouldMoveToDefaultPos(false);
+			});
+			
 		}
 		return true;
 	}

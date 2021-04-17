@@ -235,9 +235,13 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 		this.cursorPos = null;
 		this.prevCursorPos = null;
 	}
-
+	
+	int tick = 0;
 	public void tick() {
-
+		tick++;
+		if (this.shouldMoveToDefaultPos && tick % 5 == 0) {
+			this.moveToDefaultPosition();
+		}
 	}
 
 	// Use a consumer for rendering?
@@ -289,7 +293,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 		return mouseOffset;
 	}
 
-	public DraggableScreen getScreen() {
+	public DraggableScreen getParentScreen() {
 		return this.parentScreen;
 	}
 
@@ -306,7 +310,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	}
 
 	protected void moveToDefaultPosition() {
-		if (this.defaultPosition != null && this.isEnabled()) {
+		if (this.defaultPosition != null && this.isEnabled() && this.parentScreen != null) {
 			this.getBoundingBox().setPos(this.defaultPosition.apply(this.parentScreen));
 		}
 	}
