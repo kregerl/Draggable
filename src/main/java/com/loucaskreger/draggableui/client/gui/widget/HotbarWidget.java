@@ -22,6 +22,13 @@ public class HotbarWidget extends LinkingWidget {
 		this.defaultPosition = DefaultWidgetConstants.getHotbarPos();
 
 	}
+	
+	@Override
+	public void init() {
+		super.init();
+		((SelectedItemTextWidget) this.linkedWidgets.get(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation())
+				.get()).setHotbarCenterX(this.getBoundingBox().getPos().x + this.getBoundingBox().getWidth() / 2);
+	}
 
 	// Rotate 90 degrees
 	// RenderSystem.rotatef(90, 1, 1, 0);
@@ -44,6 +51,13 @@ public class HotbarWidget extends LinkingWidget {
 	}
 
 	@Override
+	public void mouseDragged(int mouseX, int mouseY) {
+		super.mouseDragged(mouseX, mouseY);
+		((SelectedItemTextWidget) this.linkedWidgets.get(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation())
+				.get()).setHotbarCenterX(this.getBoundingBox().getPos().x + this.getBoundingBox().getWidth() / 2);
+	}
+
+	@Override
 	public void onClose() {
 		super.onClose();
 		ForgeIngameGui.renderHotbar = false;
@@ -59,11 +73,12 @@ public class HotbarWidget extends LinkingWidget {
 			} else {
 				this.linkedWidgets.get(RegistryNames.OFFHAND_WIDGET.getResourceLocation()).get().setEnabled(false);
 			}
-			
+
 			if (!(mc.player.getHeldItemMainhand().isEmpty())) {
 				this.linkedWidgets.get(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation()).get().setEnabled(true);
 			} else {
-				this.linkedWidgets.get(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation()).get().setEnabled(false);
+				this.linkedWidgets.get(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation()).get()
+						.setEnabled(false);
 			}
 		}
 	}

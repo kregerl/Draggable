@@ -17,7 +17,7 @@ public class EventSubscriber {
 				&& (!WidgetManager.INSTANCE.widgets.isEmpty() || !shouldRenderDefaults)) {
 			ForgeIngameGui.renderHotbar = false;
 			ForgeIngameGui.renderHealth = false;
-			ForgeIngameGui.renderExperiance = true;
+			ForgeIngameGui.renderExperiance = false;
 			ForgeIngameGui.renderFood = false;
 			ForgeIngameGui.left_height = 39;
 			ForgeIngameGui.right_height = 39;

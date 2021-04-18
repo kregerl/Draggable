@@ -5,7 +5,7 @@ import com.loucaskreger.draggableui.util.Vec2i;
 import net.minecraft.client.Minecraft;
 
 public class LinkableWidget extends DraggableWidget {
-
+	
 	protected static final Minecraft mc = Minecraft.getInstance();
 
 	private boolean isLinked;

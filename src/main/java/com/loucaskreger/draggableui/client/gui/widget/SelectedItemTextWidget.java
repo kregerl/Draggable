@@ -11,11 +11,15 @@ import net.minecraft.item.ItemStack;
 public class SelectedItemTextWidget extends LinkableWidget {
 
 	private String name;
+	private int hotbarCenterX;
+	private ItemStack prevStack;
 	protected BiFunction<Screen, Integer, Vec2i> defaultPosition;
 
 	public SelectedItemTextWidget() {
-		super(0, 0, 100, 12);
+		super(0, 0, 10, 12);
 		this.name = "";
+		this.hotbarCenterX = 0;
+		this.prevStack = null;
 		this.defaultPosition = DefaultWidgetConstants.getSelectedTextPos();
 	}
 
@@ -36,13 +40,14 @@ public class SelectedItemTextWidget extends LinkableWidget {
 		if (this.getBoundingBox().getWidth() != stringLength && stringLength != 0)
 			this.getBoundingBox().setWidth(mc.fontRenderer.getStringWidth(name));
 
-		// Store a center point of the hotbar widget and use that to set the position of
-		// the bounding box when linked
-		
-		
-//		if (this.isLinked() && this.parentScreen != null) {
-//			this.getBoundingBox().setPos(this.getBoundingBox().getPos().add(getNameLength(), 0));
-//		}
+		if (this.prevStack == null) {
+			this.prevStack = mc.player.getHeldItemMainhand();
+		} else {
+			if (this.prevStack != mc.player.getHeldItemMainhand() && this.hotbarCenterX != 0) {
+				this.getBoundingBox()
+						.setPos(new Vec2i(this.hotbarCenterX - (this.getNameLength() / 2), this.getBoundingBox().getPos().y));
+			}
+		}
 	}
 
 	public int getNameLength() {
@@ -51,10 +56,13 @@ public class SelectedItemTextWidget extends LinkableWidget {
 
 	@Override
 	protected void moveToDefaultPosition() {
-		System.out.println("Here");
 		if (this.defaultPosition != null && this.isEnabled() && this.parentScreen != null && !name.isBlank()) {
 			this.getBoundingBox().setPos(this.defaultPosition.apply(this.parentScreen, getNameLength()));
 		}
+	}
+
+	public void setHotbarCenterX(int hotbarCenterX) {
+		this.hotbarCenterX = hotbarCenterX;
 	}
 
 }
