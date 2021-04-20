@@ -7,14 +7,15 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderState;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public class BoundingBox2D implements INBTSerializable<CompoundNBT> {
-	
+
 	public static final Color4f DEFAULT_COLOR = new Color4f(1f, 0f, 0f, 1f);
-	
+
 	private Vec2i pos;
 	private Vec2i velocity;
 	private int width;
@@ -122,28 +123,20 @@ public class BoundingBox2D implements INBTSerializable<CompoundNBT> {
 			IVertexBuilder builder = buffer.getBuffer(RenderType.LINES);
 
 			// topLeft -> topRight
-			this.drawLine(builder, new Vec2i(this.getLeft(), this.getTop()), new Vec2i(this.getRight(), this.getTop()));
+			Util.drawLine(builder, color, new Vec2i(this.getLeft(), this.getTop()),
+					new Vec2i(this.getRight(), this.getTop()));
 			// topRight -> bottomRight
-			this.drawLine(builder, new Vec2i(this.getRight(), this.getTop()),
+			Util.drawLine(builder, color, new Vec2i(this.getRight(), this.getTop()),
 					new Vec2i(this.getRight(), this.getBottom()));
 			// bottomRight -> bottomLeft
-			this.drawLine(builder, new Vec2i(this.getRight(), this.getBottom()),
+			Util.drawLine(builder, color, new Vec2i(this.getRight(), this.getBottom()),
 					new Vec2i(this.getLeft(), this.getBottom()));
 			// bottomLeft -> topLeft
-			this.drawLine(builder, new Vec2i(this.getLeft(), this.getBottom()),
+			Util.drawLine(builder, color, new Vec2i(this.getLeft(), this.getBottom()),
 					new Vec2i(this.getLeft(), this.getTop()));
 			buffer.finish(RenderType.LINES);
 			RenderSystem.popMatrix();
 		}
-	}
-
-	private void drawLine(IVertexBuilder builder, Vec2i point1, Vec2i point2) {
-		this.drawLine(builder, point1.x, point1.y, point2.x, point2.y);
-	}
-
-	private void drawLine(IVertexBuilder builder, int x1, int y1, int x2, int y2) {
-		builder.pos(x1, y1, 0).color(this.color.red, this.color.green, this.color.blue, this.color.alpha).endVertex();
-		builder.pos(x2, y2, 0).color(this.color.red, this.color.green, this.color.blue, this.color.alpha).endVertex();
 	}
 
 	public Vec2i getPos() {

@@ -228,15 +228,16 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 		return result;
 	}
 
-	public void mouseReleased() {
+	public void mouseReleased(double mouseX, double mouseY, int scrollDelta) {
 		this.getBoundingBox().setVelocity(Vec2i.ZERO);
 		this.setSelected(false);
 		this.cursorBoundingBox = null;
 		this.cursorPos = null;
 		this.prevCursorPos = null;
 	}
-	
+
 	int tick = 0;
+
 	public void tick() {
 		tick++;
 		if (this.shouldMoveToDefaultPos && tick % 5 == 0) {
@@ -259,6 +260,10 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	}
 
 	public void onClose() {
+	}
+
+	public void keyPressed(int keyCode, int scanCode, int modifiers) {
+
 	}
 
 	public boolean isEnabled() {
@@ -287,6 +292,11 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 
 	public BoundingBox2D getBoundingBox() {
 		return boundingBox;
+	}
+
+	public Vec2i getCenterPos() {
+		return new Vec2i(this.getBoundingBox().getPos().x + this.getBoundingBox().getWidth() / 2,
+				this.getBoundingBox().getPos().y + this.getBoundingBox().getHeight() / 2);
 	}
 
 	public Vec2i getMouseOffset() {

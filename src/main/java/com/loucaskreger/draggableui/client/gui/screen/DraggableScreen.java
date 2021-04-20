@@ -1,24 +1,22 @@
 package com.loucaskreger.draggableui.client.gui.screen;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_K;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_U;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_Z;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
-
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
 import com.loucaskreger.draggableui.client.gui.widget.LinkingWidget;
-import com.loucaskreger.draggableui.client.gui.widget.OffhandWidget;
 import com.loucaskreger.draggableui.util.BoundingBox2D;
 import com.loucaskreger.draggableui.util.Color4f;
 import com.loucaskreger.draggableui.util.Vec2i;
 import com.loucaskreger.draggableui.util.WidgetManager;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.HandSide;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -32,6 +30,7 @@ public class DraggableScreen extends Screen {
 	public List<DraggableWidget> widgets;
 	// static objects that cant be moved
 	public List<BoundingBox2D> staticWidgets;
+	private WidgetUndoManager undoManager;
 
 	public BoundingBox2D interiorBounds;
 
@@ -39,6 +38,7 @@ public class DraggableScreen extends Screen {
 		super(titleIn);
 		this.widgets = new ArrayList<DraggableWidget>();
 		this.staticWidgets = new ArrayList<BoundingBox2D>();
+		this.undoManager = new WidgetUndoManager(this.widgets);
 
 		this.height = mc.getMainWindow().getScaledHeight();
 		this.width = mc.getMainWindow().getScaledWidth();
@@ -113,8 +113,10 @@ public class DraggableScreen extends Screen {
 
 	@Override
 	public boolean mouseReleased(double mouseX, double mouseY, int scrollDelta) {
+		this.undoManager.addState();
+
 		this.widgets.forEach(i -> {
-			i.mouseReleased();
+			i.mouseReleased(mouseX, mouseY, scrollDelta);
 		});
 		this.staticWidgets.forEach(i -> {
 			i.drawBoundingBoxOutline();
@@ -171,6 +173,8 @@ public class DraggableScreen extends Screen {
 		if (super.keyPressed(keyCode, scanCode, modifiers) || keyCode == GLFW_KEY_K) {
 			this.onClose();
 		}
+		this.widgets.forEach(i -> i.keyPressed(keyCode, scanCode, modifiers));
+
 		if (keyCode == GLFW_KEY_LEFT_SHIFT) {
 			for (DraggableWidget widget : this.widgets) {
 				if (widget instanceof LinkingWidget) {
@@ -179,12 +183,20 @@ public class DraggableScreen extends Screen {
 				}
 			}
 		}
-		
+
 		if (keyCode == GLFW_KEY_R) {
 			this.widgets.forEach(i -> {
 				i.setShouldMoveToDefaultPos(true);
 			});
-			
+		}
+
+		if (keyCode == GLFW_KEY_Z && InputMappings.isKeyDown(mc.getMainWindow().getHandle(), GLFW_KEY_LEFT_CONTROL)
+				&& modifiers == 2) {
+			this.undoManager.undo();
+		}
+		if (keyCode == GLFW_KEY_U && InputMappings.isKeyDown(mc.getMainWindow().getHandle(), GLFW_KEY_LEFT_CONTROL)
+				&& modifiers == 2) {
+			this.undoManager.redo();
 		}
 
 		return true;
@@ -201,12 +213,12 @@ public class DraggableScreen extends Screen {
 				}
 			}
 		}
-		
+
 		if (keyCode == GLFW_KEY_R) {
 			this.widgets.forEach(i -> {
 				i.setShouldMoveToDefaultPos(false);
 			});
-			
+
 		}
 		return true;
 	}

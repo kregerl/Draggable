@@ -43,9 +43,9 @@ public class SelectedItemTextWidget extends LinkableWidget {
 		if (this.prevStack == null) {
 			this.prevStack = mc.player.getHeldItemMainhand();
 		} else {
-			if (this.prevStack != mc.player.getHeldItemMainhand() && this.hotbarCenterX != 0) {
-				this.getBoundingBox()
-						.setPos(new Vec2i(this.hotbarCenterX - (this.getNameLength() / 2), this.getBoundingBox().getPos().y));
+			if (this.prevStack != mc.player.getHeldItemMainhand() && this.hotbarCenterX != 0 && this.isLinked()) {
+				this.getBoundingBox().setPos(
+						new Vec2i(this.hotbarCenterX - (this.getNameLength() / 2), this.getBoundingBox().getPos().y));
 			}
 		}
 	}

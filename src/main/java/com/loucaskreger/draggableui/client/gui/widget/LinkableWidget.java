@@ -1,11 +1,12 @@
 package com.loucaskreger.draggableui.client.gui.widget;
 
+import com.loucaskreger.draggableui.util.Color4f;
 import com.loucaskreger.draggableui.util.Vec2i;
 
 import net.minecraft.client.Minecraft;
 
 public class LinkableWidget extends DraggableWidget {
-	
+
 	protected static final Minecraft mc = Minecraft.getInstance();
 
 	private boolean isLinked;
@@ -14,6 +15,7 @@ public class LinkableWidget extends DraggableWidget {
 	public LinkableWidget(Vec2i pos, int width, int height) {
 		super(pos, width, height);
 		this.isLinked = true;
+
 	}
 
 	public LinkableWidget(int x, int y, int width, int height) {
@@ -21,10 +23,23 @@ public class LinkableWidget extends DraggableWidget {
 	}
 
 	@Override
+	public void mouseClicked(double mouseX, double mouseY) {
+		super.mouseClicked(mouseX, mouseY);
+		if (this.isSelected()) {
+			this.setLinked(false);
+		}
+	}
+
+	@Override
 	public void tick() {
 		super.tick();
 		if (this.isSelected()) {
 			this.setLinked(false);
+		}
+		if (!this.isLinked) {
+			this.getBoundingBox().setColor(new Color4f(0.35f, 0.45f, 0.35f, 1.0f));
+		} else {
+			this.getBoundingBox().setColor(new Color4f(1f, 0f, 0f, 1f));
 		}
 	}
 
@@ -37,8 +52,8 @@ public class LinkableWidget extends DraggableWidget {
 	}
 
 	@Override
-	public void mouseReleased() {
-		super.mouseReleased();
+	public void mouseReleased(double mouseX, double mouseY, int scrollDelta) {
+		super.mouseReleased(mouseX, mouseY, scrollDelta);
 	}
 
 	protected void updateOffset(Vec2i cursorPos) {

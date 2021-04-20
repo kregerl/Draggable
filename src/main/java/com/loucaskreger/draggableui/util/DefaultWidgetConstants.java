@@ -8,8 +8,6 @@ import net.minecraft.client.gui.screen.Screen;
 
 public class DefaultWidgetConstants {
 
-	private static final Minecraft mc = Minecraft.getInstance();
-	
 	public static final int HOTBAR_WIDTH = 182;
 	public static final int HOTBAR_HEIGHT = 22;
 
@@ -47,7 +45,6 @@ public class DefaultWidgetConstants {
 	public static final int HUNGER_HEIGHT = 9;
 
 	public static Function<Screen, Vec2i> getHungerPos() {
-		return (screen) -> new Vec2i((screen.width / 2) + 91 - HUNGER_WIDTH,
-				screen.height - 39);
+		return (screen) -> new Vec2i((screen.width / 2) + 91 - HUNGER_WIDTH, screen.height - 39);
 	}
 }

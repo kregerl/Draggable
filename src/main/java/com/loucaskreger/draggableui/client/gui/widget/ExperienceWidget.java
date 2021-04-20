@@ -1,13 +1,11 @@
 package com.loucaskreger.draggableui.client.gui.widget;
 
 import java.util.Arrays;
-
 import com.loucaskreger.draggableui.client.gui.GuiRenderer;
 import com.loucaskreger.draggableui.init.WidgetRegistry;
 import com.loucaskreger.draggableui.util.DefaultWidgetConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
-import net.minecraftforge.client.gui.ForgeIngameGui;
 
 public class ExperienceWidget extends LinkingWidget {
 
@@ -35,8 +33,8 @@ public class ExperienceWidget extends LinkingWidget {
 	}
 
 	@Override
-	public void mouseReleased() {
-		super.mouseReleased();
+	public void mouseReleased(double mouseX, double mouseY, int scrollDelta) {
+		super.mouseReleased(mouseX, mouseY, scrollDelta);
 	}
 
 	@Override

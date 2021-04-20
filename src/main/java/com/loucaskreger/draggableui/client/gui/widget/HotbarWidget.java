@@ -18,16 +18,19 @@ public class HotbarWidget extends LinkingWidget {
 	public HotbarWidget() {
 		super(0, 0, DefaultWidgetConstants.HOTBAR_WIDTH, DefaultWidgetConstants.HOTBAR_HEIGHT,
 				Arrays.asList(WidgetRegistry.OFFHAND_WIDGET,
-						WidgetRegistry.SELECTED_ITEM_WIDGET)/* Offhand Widgets and selected item text here. */);
+						WidgetRegistry.SELECTED_ITEM_WIDGET));
 		this.defaultPosition = DefaultWidgetConstants.getHotbarPos();
 
 	}
-	
+
 	@Override
 	public void init() {
 		super.init();
-		((SelectedItemTextWidget) this.linkedWidgets.get(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation())
-				.get()).setHotbarCenterX(this.getBoundingBox().getPos().x + this.getBoundingBox().getWidth() / 2);
+		if (!this.linkedWidgets.isEmpty()
+				&& this.linkedWidgets.containsKey(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation())) {
+			((SelectedItemTextWidget) this.linkedWidgets.get(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation())
+					.get()).setHotbarCenterX(this.getBoundingBox().getPos().x + this.getBoundingBox().getWidth() / 2);
+		}
 	}
 
 	// Rotate 90 degrees
@@ -53,8 +56,11 @@ public class HotbarWidget extends LinkingWidget {
 	@Override
 	public void mouseDragged(int mouseX, int mouseY) {
 		super.mouseDragged(mouseX, mouseY);
-		((SelectedItemTextWidget) this.linkedWidgets.get(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation())
-				.get()).setHotbarCenterX(this.getBoundingBox().getPos().x + this.getBoundingBox().getWidth() / 2);
+		if (!this.linkedWidgets.isEmpty()
+				&& this.linkedWidgets.containsKey(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation())) {
+			((SelectedItemTextWidget) this.linkedWidgets.get(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation())
+					.get()).setHotbarCenterX(this.getBoundingBox().getPos().x + this.getBoundingBox().getWidth() / 2);
+		}
 	}
 
 	@Override
@@ -67,16 +73,18 @@ public class HotbarWidget extends LinkingWidget {
 	@Override
 	public void tick() {
 		super.tick();
-		if (this.linked) {
-			if (!(mc.player.getHeldItemOffhand() == ItemStack.EMPTY)) {
+		if (this.linked && !this.linkedWidgets.isEmpty()) {
+			if (!(mc.player.getHeldItemOffhand() == ItemStack.EMPTY)
+					&& this.linkedWidgets.containsKey(RegistryNames.OFFHAND_WIDGET.getResourceLocation())) {
 				this.linkedWidgets.get(RegistryNames.OFFHAND_WIDGET.getResourceLocation()).get().setEnabled(true);
-			} else {
+			} else if (this.linkedWidgets.containsKey(RegistryNames.OFFHAND_WIDGET.getResourceLocation())) {
 				this.linkedWidgets.get(RegistryNames.OFFHAND_WIDGET.getResourceLocation()).get().setEnabled(false);
 			}
 
-			if (!(mc.player.getHeldItemMainhand().isEmpty())) {
+			if (!(mc.player.getHeldItemMainhand().isEmpty())
+					&& this.linkedWidgets.containsKey(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation())) {
 				this.linkedWidgets.get(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation()).get().setEnabled(true);
-			} else {
+			} else if (this.linkedWidgets.containsKey(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation())) {
 				this.linkedWidgets.get(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation()).get()
 						.setEnabled(false);
 			}
