@@ -2,8 +2,6 @@ package com.loucaskreger.draggableui.util;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 
 public class DefaultWidgetConstants {

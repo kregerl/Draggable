@@ -2,7 +2,6 @@ package com.loucaskreger.draggableui.client.gui.widget;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import com.loucaskreger.draggableui.client.gui.screen.DraggableScreen;
@@ -13,12 +12,12 @@ import com.loucaskreger.draggableui.util.Vec2i;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> implements INBTSerializable<CompoundNBT> {
+
+//	private UUID uuid;
 
 	private BoundingBox2D boundingBox;
 	private BoundingBox2D cursorBoundingBox;
@@ -40,18 +39,18 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	 * widget.
 	 */
 	protected Function<Screen, Vec2i> defaultPosition;
-//	private Canvas background;
 
 	public DraggableWidget(int initialX, int initialY, int width, int height) {
 		this.boundingBox = new BoundingBox2D(new Vec2i(initialX, initialY), width, height);
 		this.isEnabled = false;
 		this.isSelected = false;
-		this.shouldMoveToDefaultPos = true;
+		this.shouldMoveToDefaultPos = false;
 		this.cursorPos = null;
 		this.prevCursorPos = null;
 		this.parentScreen = null;
 		this.defaultPosition = null;
 		this.mouseOffset = Vec2i.ZERO;
+//		this.uuid = UUID.randomUUID();
 	}
 
 	public DraggableWidget(Vec2i pos, int width, int height) {
@@ -149,7 +148,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 
 			List<BoundingBox2D> widgetBoundingBoxes = this.getWidgetBounds();
 
-//			--------------------------------------------------------
+			// --------------------------------------------------------
 			// Check for collisions against all objects
 			if ((outerCol || objCol) && !this.cursorBoundingBox.collidesAny(widgetBoundingBoxes)
 					&& !this.cursorBoundingBox.collidesAny(this.parentScreen.staticWidgets)
@@ -176,6 +175,10 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 			this.getBoundingBox().setPos(finalPos);
 			this.getBoundingBox().setVelocity(Vec2i.ZERO);
 		}
+	}
+
+	public void mouseMoved(double mouseX, double mouseY) {
+		// Empty
 	}
 
 	/*
@@ -236,11 +239,8 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 		this.prevCursorPos = null;
 	}
 
-	int tick = 0;
-
 	public void tick() {
-		tick++;
-		if (this.shouldMoveToDefaultPos && tick % 5 == 0) {
+		if (this.shouldMoveToDefaultPos) {
 			this.moveToDefaultPosition();
 		}
 	}
@@ -267,7 +267,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	}
 
 	public boolean isEnabled() {
-		return isEnabled;
+		return this.isEnabled;
 	}
 
 	public void setEnabled(boolean isEnabled) {
@@ -275,7 +275,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	}
 
 	public boolean isSelected() {
-		return isSelected;
+		return this.isSelected;
 	}
 
 	public void setSelected(boolean isSelected) {
@@ -283,7 +283,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	}
 
 	public boolean shouldMoveToDefaultPos() {
-		return shouldMoveToDefaultPos;
+		return this.shouldMoveToDefaultPos;
 	}
 
 	public void setShouldMoveToDefaultPos(boolean shouldMoveToDefaultPos) {
@@ -291,7 +291,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	}
 
 	public BoundingBox2D getBoundingBox() {
-		return boundingBox;
+		return this.boundingBox;
 	}
 
 	public Vec2i getCenterPos() {
@@ -300,7 +300,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	}
 
 	public Vec2i getMouseOffset() {
-		return mouseOffset;
+		return this.mouseOffset;
 	}
 
 	public DraggableScreen getParentScreen() {
@@ -322,38 +322,47 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	protected void moveToDefaultPosition() {
 		if (this.defaultPosition != null && this.isEnabled() && this.parentScreen != null) {
 			this.getBoundingBox().setPos(this.defaultPosition.apply(this.parentScreen));
+			this.shouldMoveToDefaultPos = false;
 		}
 	}
+
+//	public UUID getUUID() {
+//		return this.uuid;
+//	}
+
+	private static final String ID_KEY = "id";
+//	private static final String UUID_KEY = "uuid";
+	private static final String BOX_KEY = "boundingbox";
+	private static final String ENABLED_KEY = "enabled";
 
 	@Override
 	public CompoundNBT serializeNBT() {
 		CompoundNBT nbt = new CompoundNBT();
-		nbt.putString("id", this.getRegistryName().toString());
-		nbt.put("boundingbox", this.getBoundingBox().serializeNBT());
-		nbt.putBoolean("enabled", this.isEnabled());
+		nbt.putString(ID_KEY, this.getRegistryName().toString());
+//		nbt.putString(UUID_KEY, this.uuid.toString());
+		nbt.put(BOX_KEY, this.getBoundingBox().serializeNBT());
+		nbt.putBoolean(ENABLED_KEY, this.isEnabled());
 		return nbt;
 	}
 
 	@Override
 	public void deserializeNBT(CompoundNBT nbt) {
-		// Empty
+//		this.uuid = UUID.fromString(nbt.getString(UUID_KEY));
+		BoundingBox2D box = BoundingBox2D.read(nbt.getCompound(BOX_KEY));
+		this.getBoundingBox().setPos(box.getPos());
+		this.getBoundingBox().setWidth(box.getWidth());
+		this.getBoundingBox().setHeight(box.getHeight());
+		this.setEnabled(nbt.getBoolean(ENABLED_KEY));
 	}
 
-	public static DraggableWidget read(CompoundNBT nbt) {
-		ResourceLocation id = new ResourceLocation(nbt.getString("id"));
-		BoundingBox2D box = BoundingBox2D.read((CompoundNBT) nbt.get("boundingbox"));
-		boolean enabled = nbt.getBoolean("enabled");
-		for (Entry<ResourceLocation, DraggableWidget> entry : GameRegistry.findRegistry(DraggableWidget.class)
-				.getEntries()) {
-			if (entry.getKey().equals(id)) {
-				DraggableWidget widget = entry.getValue();
-				widget.getBoundingBox().setPos(box.getPos());
-				widget.getBoundingBox().setWidth(box.getWidth());
-				widget.getBoundingBox().setHeight(box.getHeight());
-				widget.setEnabled(enabled);
-				return widget;
-			}
-		}
-		return new DraggableWidget(box);
-	}
+//	@Override
+//	public Memento<CompoundNBT> saveState() {
+//		return new Memento<CompoundNBT>(this.serializeNBT());
+//	}
+//
+//	@Override
+//	public void restoreState(Memento<CompoundNBT> memento) {
+//		this.deserializeNBT(memento.getState());
+//	}
+
 }

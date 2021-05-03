@@ -16,11 +16,10 @@ public class HotbarWidget extends LinkingWidget {
 	private static final Minecraft mc = Minecraft.getInstance();
 
 	public HotbarWidget() {
-		super(0, 0, DefaultWidgetConstants.HOTBAR_WIDTH, DefaultWidgetConstants.HOTBAR_HEIGHT,
-				Arrays.asList(WidgetRegistry.OFFHAND_WIDGET,
-						WidgetRegistry.SELECTED_ITEM_WIDGET));
+		super(0, 0, DefaultWidgetConstants.HOTBAR_WIDTH, DefaultWidgetConstants.HOTBAR_HEIGHT);
 		this.defaultPosition = DefaultWidgetConstants.getHotbarPos();
-
+		this.hasDefaultLinks = true;
+		this.defaultLinks.addAll(Arrays.asList(WidgetRegistry.OFFHAND_WIDGET, WidgetRegistry.SELECTED_ITEM_WIDGET));
 	}
 
 	@Override
@@ -29,7 +28,7 @@ public class HotbarWidget extends LinkingWidget {
 		if (!this.linkedWidgets.isEmpty()
 				&& this.linkedWidgets.containsKey(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation())) {
 			((SelectedItemTextWidget) this.linkedWidgets.get(RegistryNames.SELECTED_ITEM_WIDGET.getResourceLocation())
-					.get()).setHotbarCenterX(this.getBoundingBox().getPos().x + this.getBoundingBox().getWidth() / 2);
+					.get()).setHotbarCenterX(this.getCenterPos().x);
 		}
 	}
 

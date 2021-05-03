@@ -56,7 +56,7 @@ public class SelectedItemTextWidget extends LinkableWidget {
 
 	@Override
 	protected void moveToDefaultPosition() {
-		if (this.defaultPosition != null && this.isEnabled() && this.parentScreen != null && !name.isBlank()) {
+		if (this.defaultPosition != null && this.isEnabled() && this.parentScreen != null && !name.isEmpty()) {
 			this.getBoundingBox().setPos(this.defaultPosition.apply(this.parentScreen, getNameLength()));
 		}
 	}

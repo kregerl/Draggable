@@ -2,8 +2,8 @@ package com.loucaskreger.draggableui.client.gui.widget;
 
 import com.loucaskreger.draggableui.util.Color4f;
 import com.loucaskreger.draggableui.util.Vec2i;
-
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundNBT;
 
 public class LinkableWidget extends DraggableWidget {
 
@@ -14,7 +14,8 @@ public class LinkableWidget extends DraggableWidget {
 
 	public LinkableWidget(Vec2i pos, int width, int height) {
 		super(pos, width, height);
-		this.isLinked = true;
+		this.isLinked = false;
+		this.offset = new Vec2i(0, 0);
 
 	}
 
@@ -74,6 +75,24 @@ public class LinkableWidget extends DraggableWidget {
 
 	protected void setOffset(Vec2i offset) {
 		this.offset = offset;
+	}
+
+	private static final String LINKED_KEY = "linked";
+	private static final String OFFSET_KEY = "offset";
+
+	@Override
+	public CompoundNBT serializeNBT() {
+		CompoundNBT nbt = super.serializeNBT();
+		nbt.putBoolean(LINKED_KEY, this.isLinked());
+		nbt.put(OFFSET_KEY, this.offset.serializeNBT());
+		return nbt;
+	}
+
+	@Override
+	public void deserializeNBT(CompoundNBT nbt) {
+		super.deserializeNBT(nbt);
+		this.setLinked(nbt.getBoolean(LINKED_KEY));
+		this.setOffset(Vec2i.read(nbt.getCompound(OFFSET_KEY)));
 	}
 
 }

@@ -1,6 +1,5 @@
 package com.loucaskreger.draggableui.client.gui.widget;
 
-import java.util.Arrays;
 import com.loucaskreger.draggableui.client.gui.GuiRenderer;
 import com.loucaskreger.draggableui.init.WidgetRegistry;
 import com.loucaskreger.draggableui.util.DefaultWidgetConstants;
@@ -12,9 +11,11 @@ public class ExperienceWidget extends LinkingWidget {
 	private static final Minecraft mc = Minecraft.getInstance();
 
 	public ExperienceWidget() {
-		super(0, 0, DefaultWidgetConstants.EXPERIENCE_WIDTH, DefaultWidgetConstants.EXPERIENCE_HEIGHT,
-				Arrays.asList(WidgetRegistry.EXPERIENCE_LEVEL_WIDGET));
+		super(0, 0, DefaultWidgetConstants.EXPERIENCE_WIDTH, DefaultWidgetConstants.EXPERIENCE_HEIGHT);
 		this.defaultPosition = DefaultWidgetConstants.getExperiencePos();
+		this.hasDefaultLinks = true;
+		this.defaultLinks.add(WidgetRegistry.EXPERIENCE_LEVEL_WIDGET);
+
 	}
 
 	@Override

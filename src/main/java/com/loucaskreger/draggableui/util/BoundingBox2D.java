@@ -1,13 +1,10 @@
 package com.loucaskreger.draggableui.util;
 
 import java.util.List;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.RenderState;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -38,6 +35,10 @@ public class BoundingBox2D implements INBTSerializable<CompoundNBT> {
 
 	BoundingBox2D(CompoundNBT nbt) {
 		this.deserializeNBT(nbt);
+	}
+
+	public BoundingBox2D() {
+		this(new Vec2i(0, 0), 0, 0);
 	}
 
 	@Override

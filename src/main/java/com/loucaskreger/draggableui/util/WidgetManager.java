@@ -7,11 +7,16 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
 import com.loucaskreger.draggableui.DraggableUI;
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
+
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 public class WidgetManager {
@@ -48,13 +53,20 @@ public class WidgetManager {
 				ListNBT list = (ListNBT) nbt.get(LIST_KEY);
 				for (int i = 0; i < list.size(); i++) {
 					CompoundNBT tag = list.getCompound(i);
-					widgets.add(DraggableWidget.read(tag));
+					widgets.add(this.read(tag));
 				}
 			} catch (IOException e) {
 				DraggableUI.LOGGER.error(e);
 			}
 		}
 
+	}
+
+	public DraggableWidget read(CompoundNBT tag) {
+		DraggableWidget wid = GameRegistry.findRegistry(DraggableWidget.class)
+				.getValue(new ResourceLocation(tag.getString("id")));
+		((INBTSerializable<CompoundNBT>) wid).deserializeNBT(tag);
+		return wid;
 	}
 
 	public void saveState(List<DraggableWidget> widgets) {
