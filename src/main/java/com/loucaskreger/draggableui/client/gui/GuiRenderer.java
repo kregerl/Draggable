@@ -2,20 +2,23 @@ package com.loucaskreger.draggableui.client.gui;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_K;
 
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.loucaskreger.draggableui.DraggableUI;
 import com.loucaskreger.draggableui.EventSubscriber;
 import com.loucaskreger.draggableui.client.gui.screen.DraggableScreen;
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
-import com.loucaskreger.draggableui.client.gui.widget.HotbarWidget;
-import com.loucaskreger.draggableui.client.gui.widget.SelectedItemTextWidget;
+import com.loucaskreger.draggableui.client.gui.widget.ITickableWidget;
 import com.loucaskreger.draggableui.util.WidgetManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.settings.AttackIndicatorStatus;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,13 +28,18 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 @Mod.EventBusSubscriber(modid = DraggableUI.MOD_ID)
 public class GuiRenderer {
+
+	public static Deque<ItemStack> recentCrafts = new LinkedList<ItemStack>();
 
 	public static final KeyBinding key = new KeyBinding(DraggableUI.MOD_ID + ".key.press", GLFW_KEY_K,
 			DraggableUI.MOD_ID + ".key.categories");
@@ -48,7 +56,7 @@ public class GuiRenderer {
 			}
 			List<DraggableWidget> widgets = WidgetManager.INSTANCE.getWidgets();
 			for (DraggableWidget widget : widgets) {
-				if (widget instanceof HotbarWidget || widget instanceof SelectedItemTextWidget) {
+				if (widget instanceof ITickableWidget) {
 					widget.tick();
 				}
 				widget.render(0, 0, 0, mc.ingameGUI);
@@ -78,9 +86,26 @@ public class GuiRenderer {
 		}
 
 		if (key.isPressed()) {
-			EventSubscriber.shouldRenderDefaults = false;
+			EventSubscriber.renderDefaults = false;
 			DraggableScreen.open();
 		}
+	}
+
+	@SubscribeEvent
+	public static void drawScreen(final GuiScreenEvent.DrawScreenEvent.Post event) {
+		Screen screen = event.getGui();
+		if (screen instanceof ContainerScreen) {
+			ContainerScreen<?> inv = ((ContainerScreen<?>) screen);
+			// guiLeft
+//			ObfuscationReflectionHelper.setPrivateValue(ContainerScreen.class, inv, 200, "field_147003_i");
+//			System.out.println(inv.getGuiLeft());
+			DraggableScreen.open(mc.playerController.getCurrentGameType(), inv);
+		}
+	}
+
+	@SubscribeEvent
+	public static void onItemCrafted(final PlayerEvent.ItemCraftedEvent event) {
+		recentCrafts.addFirst(event.getCrafting());
 	}
 
 	public static class Expbar {
@@ -152,7 +177,7 @@ public class GuiRenderer {
 
 				for (int i1 = 0; i1 < 9; ++i1) {
 					int j1 = x + 1 + i1 * 20 + 2;
-					int k1 = /* this.scaledHeight */y + 3;
+					int k1 = y + 3; // y = this.scaledHeight
 					renderHotbarItem(j1, k1, screenWidth, screenHeight, partialTicks, playerentity,
 							playerentity.inventory.mainInventory.get(i1));
 				}
@@ -160,7 +185,7 @@ public class GuiRenderer {
 				if (mc.gameSettings.attackIndicator == AttackIndicatorStatus.HOTBAR) {
 					float f = mc.player.getCooledAttackStrength(0.0F);
 					if (f < 1.0F) {
-						int j2 = /* this.scaledHeight */y;
+						int j2 = y;// this.scaledHeight
 						int k2 = x + 91 + 6;
 						if (handside == HandSide.RIGHT) {
 							k2 = i - 91 - 22;
@@ -207,9 +232,6 @@ public class GuiRenderer {
 				s = highlightingItemStack.getHighlightTip(s);
 				int i = x;
 				int j = y;
-//				System.out.println(scaledWidth);
-//				System.out.println(scaledHeight);
-//				System.out.println(mc.fontRenderer.getStringWidth(s));
 				if (j <= 0) {
 					j -= j - 1;
 					if (y == 0) {

@@ -2,6 +2,7 @@ package com.loucaskreger.draggableui.client.gui.widget;
 
 import com.loucaskreger.draggableui.client.gui.GuiRenderer;
 import com.loucaskreger.draggableui.util.DefaultWidgetConstants;
+import com.loucaskreger.draggableui.util.WidgetType;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.AbstractGui;
@@ -13,6 +14,7 @@ public class OffhandWidget extends LinkableWidget {
 	public OffhandWidget() {
 		super(0, 0, 22, 22);
 		this.defaultPosition = DefaultWidgetConstants.getOffhandPos();
+		this.type = WidgetType.ANY_HUD;
 	}
 
 	@Override

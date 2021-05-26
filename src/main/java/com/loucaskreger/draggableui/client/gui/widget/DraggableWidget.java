@@ -3,12 +3,16 @@ package com.loucaskreger.draggableui.client.gui.widget;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
 import javax.annotation.Nullable;
+
 import com.loucaskreger.draggableui.client.gui.screen.DraggableScreen;
 import com.loucaskreger.draggableui.util.BoundingBox2D;
 import com.loucaskreger.draggableui.util.Color4f;
 import com.loucaskreger.draggableui.util.Util;
 import com.loucaskreger.draggableui.util.Vec2i;
+import com.loucaskreger.draggableui.util.WidgetType;
+
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.nbt.CompoundNBT;
@@ -24,10 +28,12 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	protected Vec2i mouseOffset;
 	protected Vec2i cursorPos;
 	protected Vec2i prevCursorPos;
+	protected WidgetType type;
 
 	private boolean isEnabled;
 	private boolean isSelected;
 	private boolean shouldMoveToDefaultPos;
+	protected boolean isSerilizable;
 	@Nullable
 	protected DraggableScreen parentScreen;
 
@@ -44,12 +50,14 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 		this.boundingBox = new BoundingBox2D(new Vec2i(initialX, initialY), width, height);
 		this.isEnabled = false;
 		this.isSelected = false;
+		this.isSerilizable = true;
 		this.shouldMoveToDefaultPos = false;
 		this.cursorPos = null;
 		this.prevCursorPos = null;
 		this.parentScreen = null;
 		this.defaultPosition = null;
 		this.mouseOffset = Vec2i.ZERO;
+		this.type = WidgetType.ANY;
 //		this.uuid = UUID.randomUUID();
 	}
 
@@ -61,7 +69,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 		this(box.getPos(), box.getWidth(), box.getHeight());
 	}
 
-	public void mouseClicked(double mouseX, double mouseY) {
+	public void mouseClicked(double mouseX, double mouseY, int mouseButton) {
 		this.updateCursorPositions(mouseX, mouseY);
 
 		if (this.cursorPos != null) {
@@ -136,7 +144,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 		if (this.isSelected() && this.parentScreen != null) {
 			this.updateCursorPositions(mouseX, mouseY);
 			this.moveCursorBounds(this.mouseOffset);
-			// Apply velocity based on mouse cursor position
+			// Apply velocity based on mouse movement
 			Vec2i velocity = this.getCursorVelocity();
 			this.getBoundingBox().addVelocity(velocity);
 
@@ -232,6 +240,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	}
 
 	public void mouseReleased(double mouseX, double mouseY, int scrollDelta) {
+
 		this.getBoundingBox().setVelocity(Vec2i.ZERO);
 		this.setSelected(false);
 		this.cursorBoundingBox = null;
@@ -239,14 +248,17 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 		this.prevCursorPos = null;
 	}
 
+	/**
+	 * Only ticks while the draggable screen is open. Use {@link ITickableWidget} if
+	 * widget needs to tick all the time.
+	 */
 	public void tick() {
+
 		if (this.shouldMoveToDefaultPos) {
 			this.moveToDefaultPosition();
 		}
 	}
 
-	// Use a consumer for rendering?
-	// functions the same as defaultPosition
 	public void render(int mouseX, int mouseY, float partialTicks, AbstractGui screen) {
 		if (this.isEnabled()) {
 			if (this.getBoundingBox().isVisible()) {
@@ -331,7 +343,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 //	}
 
 	private static final String ID_KEY = "id";
-//	private static final String UUID_KEY = "uuid";
+	private static final String UUID_KEY = "uuid";
 	private static final String BOX_KEY = "boundingbox";
 	private static final String ENABLED_KEY = "enabled";
 
@@ -354,6 +366,21 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 		this.getBoundingBox().setHeight(box.getHeight());
 		this.setEnabled(nbt.getBoolean(ENABLED_KEY));
 	}
+
+	public boolean isSerilizable() {
+		return isSerilizable;
+	}
+
+//	@Override
+//	public Memento<CompoundNBT> saveState() {
+//		return null;
+//	}
+//
+//	@Override
+//	public void restoreState(Memento<CompoundNBT> memento) {
+//		// TODO Auto-generated method stub
+//
+//	}
 
 //	@Override
 //	public Memento<CompoundNBT> saveState() {

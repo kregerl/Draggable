@@ -66,8 +66,8 @@ public class LinkingWidget extends DraggableWidget {
 	}
 
 	@Override
-	public void mouseClicked(double mouseX, double mouseY) {
-		super.mouseClicked(mouseX, mouseY);
+	public void mouseClicked(double mouseX, double mouseY, int scrollDelta) {
+		super.mouseClicked(mouseX, mouseY, scrollDelta);
 
 		if (this.isLinkingModeKeyPressed && this.isSelected()) {
 			this.linkingMode = true;
@@ -75,6 +75,10 @@ public class LinkingWidget extends DraggableWidget {
 		}
 
 		if (Util.isWithinBounds(new Vec2i(mouseX, mouseY), this.getBoundingBox())) {
+			this.linkedWidgets.forEach((loc, wid) -> {
+				if (wid.get().shouldMoveToDefaultPos())
+					wid.get().setShouldMoveToDefaultPos(false);
+			});
 			this.updateOffset();
 		}
 	}
@@ -100,6 +104,7 @@ public class LinkingWidget extends DraggableWidget {
 				it.remove();
 			}
 		}
+
 	}
 
 	private boolean areAnyLinked() {

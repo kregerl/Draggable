@@ -3,6 +3,8 @@ package com.loucaskreger.draggableui.client.gui.widget;
 import com.loucaskreger.draggableui.client.gui.GuiRenderer;
 import com.loucaskreger.draggableui.init.WidgetRegistry;
 import com.loucaskreger.draggableui.util.DefaultWidgetConstants;
+import com.loucaskreger.draggableui.util.WidgetType;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 
@@ -15,6 +17,7 @@ public class ExperienceWidget extends LinkingWidget {
 		this.defaultPosition = DefaultWidgetConstants.getExperiencePos();
 		this.hasDefaultLinks = true;
 		this.defaultLinks.add(WidgetRegistry.EXPERIENCE_LEVEL_WIDGET);
+		this.type = WidgetType.SURVIVAL_AND_ADVENTURE;
 
 	}
 

@@ -2,6 +2,7 @@ package com.loucaskreger.draggableui.client.gui.widget;
 
 import com.loucaskreger.draggableui.client.gui.GuiRenderer;
 import com.loucaskreger.draggableui.util.DefaultWidgetConstants;
+import com.loucaskreger.draggableui.util.WidgetType;
 
 import net.minecraft.client.gui.AbstractGui;
 
@@ -10,6 +11,7 @@ public class ExperienceLevelWidget extends LinkableWidget {
 	public ExperienceLevelWidget() {
 		super(0, 0, 12, 11);
 		this.defaultPosition = DefaultWidgetConstants.getExperienceLevelPos();
+		this.type = WidgetType.SURVIVAL_AND_ADVENTURE;
 	}
 
 	@Override

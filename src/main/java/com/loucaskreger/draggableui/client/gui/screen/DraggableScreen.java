@@ -8,23 +8,31 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_Z;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
+import com.loucaskreger.draggableui.DraggableUI;
+import com.loucaskreger.draggableui.client.gui.widget.ContainerScreenWidget;
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
+import com.loucaskreger.draggableui.client.gui.widget.StaticWidget;
+import com.loucaskreger.draggableui.init.WidgetRegistry;
 import com.loucaskreger.draggableui.util.BoundingBox2D;
 import com.loucaskreger.draggableui.util.Vec2i;
 import com.loucaskreger.draggableui.util.WidgetManager;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.util.InputMappings;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.GameType;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class DraggableScreen extends Screen {
+public class DraggableScreen extends Screen implements INBTSerializable<CompoundNBT> {
 
 	private static final Minecraft mc = Minecraft.getInstance();
 
@@ -32,17 +40,19 @@ public class DraggableScreen extends Screen {
 	public List<DraggableWidget> widgets;
 	// static objects that cant be moved
 	public List<BoundingBox2D> staticWidgets;
-	public WidgetUndoManager undoManager;
+	private static final ResourceLocation TEXTURE = new ResourceLocation(DraggableUI.MOD_ID,
+			"textures/gui/background.png");
 
 	public DraggableScreen(ITextComponent titleIn) {
 		super(titleIn);
 		this.widgets = new ArrayList<DraggableWidget>();
 		this.staticWidgets = new ArrayList<BoundingBox2D>();
-		this.undoManager = new WidgetUndoManager(this);
 
 		this.height = mc.getMainWindow().getScaledHeight();
 		this.width = mc.getMainWindow().getScaledWidth();
 
+		StaticWidget rightClickMenu = new StaticWidget(new BoundingBox2D(0, 0, 50, 70));
+		
 		if (WidgetManager.INSTANCE.isDirty()) {
 			WidgetManager.INSTANCE.loadWidgets();
 		}
@@ -72,26 +82,53 @@ public class DraggableScreen extends Screen {
 		// Right Bound
 		this.staticWidgets.add(new BoundingBox2D(new Vec2i(0, 0).add(this.width + 1, 0), 5, this.height));
 
-		int crosshairSize = 9;
-		// Vertical crosshair bound
-		this.staticWidgets.add(new BoundingBox2D(
-				new Vec2i(this.width % 2 != 0 ? (this.width / 2) : (this.width / 2) - 1, (this.height / 2) - 4), 1,
-				crosshairSize));
-		// Horizontal crosshair bound
-		this.staticWidgets.add(new BoundingBox2D(
-				new Vec2i(this.width % 2 != 0 ? (this.width / 2) - 4 : (this.width / 2) - 5, (this.height / 2)),
-				crosshairSize, 1));
+//		int crosshairSize = 9;
+//		// Vertical crosshair bound
+//		this.staticWidgets.add(new BoundingBox2D(
+//				new Vec2i(this.width % 2 != 0 ? (this.width / 2) : (this.width / 2) - 1, (this.height / 2) - 4), 1,
+//				crosshairSize));
+//		// Horizontal crosshair bound
+//		this.staticWidgets.add(new BoundingBox2D(
+//				new Vec2i(this.width % 2 != 0 ? (this.width / 2) - 4 : (this.width / 2) - 5, (this.height / 2)),
+//				crosshairSize, 1));
 
+	}
+
+	public DraggableScreen(ITextComponent title, DraggableWidget... widgets) {
+		this(title);
+		this.widgets.clear();
+		for (DraggableWidget widget : widgets) {
+			widget.setScreen(this);
+			widget.setEnabled(true);
+			widget.setShouldMoveToDefaultPos(false);
+			this.widgets.add(widget);
+		}
+	}
+
+	public DraggableScreen(ContainerScreen<?> previousScreen, ITextComponent title, DraggableWidget... widgets) {
+		this(title, widgets);
+		this.widgets.add(0, new ContainerScreenWidget(previousScreen));
 	}
 
 	public DraggableScreen() {
 		this(new StringTextComponent("test"));
 	}
 
+	public DraggableScreen(ContainerScreen<?> previousScreen) {
+		this(new StringTextComponent("test"));
+		this.widgets.add(new ContainerScreenWidget(previousScreen));
+	}
+
 	@Override
 	public void tick() {
 		super.tick();
 		this.widgets.forEach(i -> i.tick());
+		this.widgets.forEach(i -> {
+//			System.out.println(i.getState().isChanged());
+//			if (!i.getState().isChanged()) {
+//				this.undoManager.addState(i);
+//			}
+		});
 	}
 
 	@Override
@@ -100,10 +137,13 @@ public class DraggableScreen extends Screen {
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int scrollDelta) {
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 //		Need to add undo/redo state after widgets have registered mouse clicks otherwise none are selected
-		this.widgets.forEach(i -> i.mouseClicked(mouseX, mouseY));
-		return super.mouseClicked(mouseX, mouseY, scrollDelta);
+		if (mouseButton == 0) {
+			this.widgets.forEach(i -> i.mouseClicked(mouseX, mouseY, mouseButton));
+		}
+
+		return super.mouseClicked(mouseX, mouseY, mouseButton);
 
 	}
 
@@ -136,6 +176,7 @@ public class DraggableScreen extends Screen {
 
 	@Override
 	public void render(int mouseX, int mouseY, float partialTicks) {
+
 		this.widgets.forEach(i -> {
 			i.getBoundingBox().setVisible(true);
 			i.render(mouseX, mouseY, partialTicks, this);
@@ -148,15 +189,13 @@ public class DraggableScreen extends Screen {
 		super.render(mouseX, mouseY, partialTicks);
 	}
 
-	public static void open() {
-		Minecraft.getInstance().displayGuiScreen(new DraggableScreen());
-	}
-
 	@Override
 	public void onClose() {
-		WidgetManager.INSTANCE.saveState(this.widgets);
-		this.widgets.forEach(i -> i.onClose());
-//		this.undoManager.clear();
+		WidgetManager.INSTANCE
+				.saveState(this.widgets.stream().filter(i -> i.isSerilizable()).collect(Collectors.toList()));
+		this.widgets.forEach(i -> {
+			i.onClose();
+		});
 		super.onClose();
 
 	}
@@ -182,11 +221,11 @@ public class DraggableScreen extends Screen {
 
 		if (keyCode == GLFW_KEY_Z && InputMappings.isKeyDown(mc.getMainWindow().getHandle(), GLFW_KEY_LEFT_CONTROL)
 				&& modifiers == 2) {
-			this.undoManager.undo();
+//			this.undoManager.undo();
 		}
 		if (keyCode == GLFW_KEY_U && InputMappings.isKeyDown(mc.getMainWindow().getHandle(), GLFW_KEY_LEFT_CONTROL)
 				&& modifiers == 2) {
-			this.undoManager.redo();
+//			this.undoManager.redo();
 		}
 
 		return true;
@@ -203,6 +242,70 @@ public class DraggableScreen extends Screen {
 
 		}
 		return true;
+	}
+
+	public static void open() {
+		Minecraft.getInstance().displayGuiScreen(new DraggableScreen());
+	}
+
+	public static void open(ContainerScreen<?> screen) {
+		Minecraft.getInstance().displayGuiScreen(new DraggableScreen(screen));
+	}
+
+	public static void open(ITextComponent title, DraggableWidget... widgets) {
+		Minecraft.getInstance().displayGuiScreen(new DraggableScreen(title, widgets));
+	}
+
+	public static void open(GameType type) {
+		switch (type) {
+		case SURVIVAL:
+		case ADVENTURE:
+			DraggableScreen.open(new StringTextComponent(type.getName()), WidgetRegistry.HEALTH_WIDGET.get(),
+					WidgetRegistry.HUNGER_WIDGET.get(), WidgetRegistry.HOTBAR_WIDGET.get(),
+					WidgetRegistry.EXPERIENCE_LEVEL_WIDGET.get(), WidgetRegistry.OFFHAND_WIDGET.get(),
+					WidgetRegistry.SELECTED_ITEM_WIDGET.get());
+			break;
+		case CREATIVE:
+
+			break;
+		case SPECTATOR:
+			break;
+		case NOT_SET:
+		default:
+			break;
+
+		}
+	}
+
+	public static void open(GameType type, ContainerScreen<?> previousScreen) {
+		switch (type) {
+		case SURVIVAL:
+		case ADVENTURE:
+			break;
+		case CREATIVE:
+			Minecraft.getInstance()
+					.displayGuiScreen(new DraggableScreen(previousScreen, new StringTextComponent(type.getName()),
+							WidgetRegistry.HEALTH_WIDGET.get(), WidgetRegistry.HUNGER_WIDGET.get(),
+							WidgetRegistry.HOTBAR_WIDGET.get(), WidgetRegistry.EXPERIENCE_LEVEL_WIDGET.get(),
+							WidgetRegistry.OFFHAND_WIDGET.get(), WidgetRegistry.SELECTED_ITEM_WIDGET.get()));
+			break;
+		case SPECTATOR:
+			break;
+		case NOT_SET:
+		default:
+			break;
+
+		}
+	}
+
+	@Override
+	public CompoundNBT serializeNBT() {
+		return null;
+	}
+
+	@Override
+	public void deserializeNBT(CompoundNBT nbt) {
+
 	}
 
 }

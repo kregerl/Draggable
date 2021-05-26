@@ -11,7 +11,8 @@ public enum RegistryNames {
 	HOTBAR_WIDGET(new ResourceLocation(DraggableUI.MOD_ID, "hotbar_widget")),
 	EXPERIENCE_LEVEL_WIDGET(new ResourceLocation(DraggableUI.MOD_ID, "experience_level_widget")),
 	OFFHAND_WIDGET(new ResourceLocation(DraggableUI.MOD_ID, "offhand_widget")),
-	SELECTED_ITEM_WIDGET(new ResourceLocation(DraggableUI.MOD_ID, "selected_item_widget"));
+	SELECTED_ITEM_WIDGET(new ResourceLocation(DraggableUI.MOD_ID, "selected_item_widget")),
+	COORDINATE_WIDGET(new ResourceLocation(DraggableUI.MOD_ID, "coordinate_widget"));
 
 	private ResourceLocation location;
 

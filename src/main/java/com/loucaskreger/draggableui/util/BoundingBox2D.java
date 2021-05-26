@@ -33,6 +33,10 @@ public class BoundingBox2D implements INBTSerializable<CompoundNBT> {
 		this(pos, width, height, DEFAULT_COLOR);
 	}
 
+	public BoundingBox2D(int x, int y, int width, int height) {
+		this(new Vec2i(x, y), width, height, DEFAULT_COLOR);
+	}
+
 	BoundingBox2D(CompoundNBT nbt) {
 		this.deserializeNBT(nbt);
 	}

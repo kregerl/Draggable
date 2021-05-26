@@ -1,6 +1,8 @@
 package com.loucaskreger.draggableui.client.gui.widget;
 
 import com.loucaskreger.draggableui.util.DefaultWidgetConstants;
+import com.loucaskreger.draggableui.util.WidgetType;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.IngameGui;
@@ -13,6 +15,7 @@ public class HungerWidget extends DraggableWidget {
 	public HungerWidget() {
 		super(0, 0, DefaultWidgetConstants.HUNGER_WIDTH, DefaultWidgetConstants.HUNGER_HEIGHT);
 		this.defaultPosition = DefaultWidgetConstants.getHungerPos();
+		this.type = WidgetType.SURVIVAL_AND_ADVENTURE;
 	}
 
 	@Override

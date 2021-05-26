@@ -24,8 +24,8 @@ public class LinkableWidget extends DraggableWidget {
 	}
 
 	@Override
-	public void mouseClicked(double mouseX, double mouseY) {
-		super.mouseClicked(mouseX, mouseY);
+	public void mouseClicked(double mouseX, double mouseY, int scrollDelta) {
+		super.mouseClicked(mouseX, mouseY, scrollDelta);
 		if (this.isSelected()) {
 			this.setLinked(false);
 		}
@@ -75,6 +75,12 @@ public class LinkableWidget extends DraggableWidget {
 
 	protected void setOffset(Vec2i offset) {
 		this.offset = offset;
+	}
+
+	@Override
+	protected void moveToDefaultPosition() {
+		super.moveToDefaultPosition();
+		System.out.println("Here");
 	}
 
 	private static final String LINKED_KEY = "linked";

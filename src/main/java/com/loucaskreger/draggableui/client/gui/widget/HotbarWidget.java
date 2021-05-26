@@ -5,13 +5,14 @@ import com.loucaskreger.draggableui.client.gui.GuiRenderer;
 import com.loucaskreger.draggableui.init.RegistryNames;
 import com.loucaskreger.draggableui.init.WidgetRegistry;
 import com.loucaskreger.draggableui.util.DefaultWidgetConstants;
+import com.loucaskreger.draggableui.util.WidgetType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
-public class HotbarWidget extends LinkingWidget {
+public class HotbarWidget extends LinkingWidget implements ITickableWidget {
 
 	private static final Minecraft mc = Minecraft.getInstance();
 
@@ -20,6 +21,7 @@ public class HotbarWidget extends LinkingWidget {
 		this.defaultPosition = DefaultWidgetConstants.getHotbarPos();
 		this.hasDefaultLinks = true;
 		this.defaultLinks.addAll(Arrays.asList(WidgetRegistry.OFFHAND_WIDGET, WidgetRegistry.SELECTED_ITEM_WIDGET));
+		this.type = WidgetType.ANY_HUD;
 	}
 
 	@Override

@@ -1,14 +1,17 @@
 package com.loucaskreger.draggableui.client.gui.widget;
 
 import java.util.function.BiFunction;
+
 import com.loucaskreger.draggableui.client.gui.GuiRenderer;
 import com.loucaskreger.draggableui.util.DefaultWidgetConstants;
 import com.loucaskreger.draggableui.util.Vec2i;
+import com.loucaskreger.draggableui.util.WidgetType;
+
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 
-public class SelectedItemTextWidget extends LinkableWidget {
+public class SelectedItemTextWidget extends LinkableWidget implements ITickableWidget {
 
 	private String name;
 	private int hotbarCenterX;
@@ -21,6 +24,7 @@ public class SelectedItemTextWidget extends LinkableWidget {
 		this.hotbarCenterX = 0;
 		this.prevStack = null;
 		this.defaultPosition = DefaultWidgetConstants.getSelectedTextPos();
+		this.type = WidgetType.ANY_HUD;
 	}
 
 	@Override

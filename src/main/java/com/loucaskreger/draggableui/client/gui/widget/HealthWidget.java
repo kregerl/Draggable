@@ -1,6 +1,7 @@
 package com.loucaskreger.draggableui.client.gui.widget;
 
 import com.loucaskreger.draggableui.util.DefaultWidgetConstants;
+import com.loucaskreger.draggableui.util.WidgetType;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
@@ -14,6 +15,7 @@ public class HealthWidget extends DraggableWidget {
 	public HealthWidget() {
 		super(0, 0, DefaultWidgetConstants.HEALTH_WIDTH, DefaultWidgetConstants.HEALTH_HEIGHT);
 		this.defaultPosition = DefaultWidgetConstants.getHealthPos();
+		this.type = WidgetType.SURVIVAL_AND_ADVENTURE;
 	}
 
 	@Override
