@@ -24,7 +24,7 @@ public class Canvas {
 	}
 
 	public Canvas(BoundingBox2D boundingBox) {
-		this(boundingBox, new Color4f(1.0f, 0.0f, 0.0f, 1.0f));
+		this(boundingBox, Color4f.BLANK);
 	}
 
 	public void render(AbstractGui screen) {

@@ -5,12 +5,9 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_U;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_Z;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.loucaskreger.draggableui.DraggableUI;
 import com.loucaskreger.draggableui.client.gui.widget.ContainerScreenWidget;
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
 import com.loucaskreger.draggableui.client.gui.widget.StaticWidget;
@@ -18,13 +15,11 @@ import com.loucaskreger.draggableui.init.WidgetRegistry;
 import com.loucaskreger.draggableui.util.BoundingBox2D;
 import com.loucaskreger.draggableui.util.Vec2i;
 import com.loucaskreger.draggableui.util.WidgetManager;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.GameType;
@@ -39,20 +34,19 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 	// Movable widgets
 	public List<DraggableWidget> widgets;
 	// static objects that cant be moved
-	public List<BoundingBox2D> staticWidgets;
-	private static final ResourceLocation TEXTURE = new ResourceLocation(DraggableUI.MOD_ID,
-			"textures/gui/background.png");
+	public List<StaticWidget> staticWidgets;
+	private StaticWidget rightClickMenu;
 
 	public DraggableScreen(ITextComponent titleIn) {
 		super(titleIn);
 		this.widgets = new ArrayList<DraggableWidget>();
-		this.staticWidgets = new ArrayList<BoundingBox2D>();
+		this.staticWidgets = new ArrayList<StaticWidget>();
 
 		this.height = mc.getMainWindow().getScaledHeight();
 		this.width = mc.getMainWindow().getScaledWidth();
 
-		StaticWidget rightClickMenu = new StaticWidget(new BoundingBox2D(0, 0, 50, 70));
-		
+		this.rightClickMenu = new StaticWidget(new BoundingBox2D(0, 0, 70, 90), this);
+
 		if (WidgetManager.INSTANCE.isDirty()) {
 			WidgetManager.INSTANCE.loadWidgets();
 		}
@@ -74,13 +68,17 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 		}
 
 		// Bottom Bound
-		this.staticWidgets.add(new BoundingBox2D(new Vec2i(0, 0).add(0, this.height + 1), this.width, 10));
+		this.staticWidgets.add(
+				new StaticWidget(new BoundingBox2D(new Vec2i(0, 0).add(0, this.height + 1), this.width, 10), this));
 		// Top Bound
-		this.staticWidgets.add(new BoundingBox2D(new Vec2i(0, 0).subtract(0, 6), this.width, 5));
+		this.staticWidgets
+				.add(new StaticWidget(new BoundingBox2D(new Vec2i(0, 0).subtract(0, 6), this.width, 5), this));
 		// Left Bound
-		this.staticWidgets.add(new BoundingBox2D(new Vec2i(0, 0).subtract(6, 0), 5, this.height));
+		this.staticWidgets
+				.add(new StaticWidget(new BoundingBox2D(new Vec2i(0, 0).subtract(6, 0), 5, this.height), this));
 		// Right Bound
-		this.staticWidgets.add(new BoundingBox2D(new Vec2i(0, 0).add(this.width + 1, 0), 5, this.height));
+		this.staticWidgets
+				.add(new StaticWidget(new BoundingBox2D(new Vec2i(0, 0).add(this.width + 1, 0), 5, this.height), this));
 
 //		int crosshairSize = 9;
 //		// Vertical crosshair bound
@@ -142,7 +140,11 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 		if (mouseButton == 0) {
 			this.widgets.forEach(i -> i.mouseClicked(mouseX, mouseY, mouseButton));
 		}
+		this.rightClickMenu.mouseClicked(mouseX, mouseY, mouseButton, this);
 
+		if (mouseButton == 1 && this.rightClickMenu.getButton() != null) {
+			this.addButton(this.rightClickMenu.getButton());
+		}
 		return super.mouseClicked(mouseX, mouseY, mouseButton);
 
 	}
@@ -153,7 +155,7 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 			i.mouseReleased(mouseX, mouseY, scrollDelta);
 		});
 		this.staticWidgets.forEach(i -> {
-			i.drawBoundingBoxOutline();
+			i.getBoundingBox().drawBoundingBoxOutline();
 		});
 		return super.mouseReleased(mouseX, mouseY, scrollDelta);
 	}
@@ -172,6 +174,10 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 	public void mouseMoved(double mouseX, double mouseY) {
 		// Used for hover detection
 		this.widgets.forEach(i -> i.mouseMoved(mouseX, mouseY));
+		this.rightClickMenu.mouseMoved(mouseX, mouseY);
+		if (!this.rightClickMenu.isMouseClicked() && this.rightClickMenu.getButton() != null) {
+			this.buttons.remove(this.rightClickMenu.getButton());
+		}
 	}
 
 	@Override
@@ -182,10 +188,10 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 			i.render(mouseX, mouseY, partialTicks, this);
 		});
 		this.staticWidgets.forEach(i -> {
-			i.setVisible(true);
-			i.drawBoundingBoxOutline();
+			i.getBoundingBox().setVisible(true);
+			i.getBoundingBox().drawBoundingBoxOutline();
 		});
-
+		this.rightClickMenu.render(mouseX, mouseY, partialTicks, this);
 		super.render(mouseX, mouseY, partialTicks);
 	}
 

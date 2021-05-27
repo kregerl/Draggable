@@ -58,7 +58,7 @@ public class CoordinateWidget extends DraggableWidget implements ITickableWidget
 		int x = this.getBoundingBox().getPos().x;
 		int y = this.getBoundingBox().getPos().y;
 
-		canvas.render(screen);
+		this.canvas.render(screen);
 		fontRenderer.drawString(this.position,
 				x + (this.getBoundingBox().getWidth() / 2) - (fontRenderer.getStringWidth(this.position) / 2), y + 2,
 				TEXT_COLOR);

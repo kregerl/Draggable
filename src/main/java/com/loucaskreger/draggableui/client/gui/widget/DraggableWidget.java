@@ -3,6 +3,7 @@ package com.loucaskreger.draggableui.client.gui.widget;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -159,7 +160,8 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 			// --------------------------------------------------------
 			// Check for collisions against all objects
 			if ((outerCol || objCol) && !this.cursorBoundingBox.collidesAny(widgetBoundingBoxes)
-					&& !this.cursorBoundingBox.collidesAny(this.parentScreen.staticWidgets)
+					&& !this.cursorBoundingBox.collidesAny(this.parentScreen.staticWidgets.stream()
+							.map(sw -> sw.getBoundingBox()).collect(Collectors.toList()))
 					&& !this.cursorBoundingBox.isWithinAny(widgetBoundingBoxes)) {
 				this.getBoundingBox().setVelocity(
 						this.cursorPos.subtract(this.mouseOffset).subtract(this.getBoundingBox().getPos()));
@@ -175,7 +177,8 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 					this.getBoundingBox().getHeight());
 			if (!this.cursorBoundingBox.equals(simulatedBoundingBox)
 					&& !this.cursorBoundingBox.collidesAny(widgetBoundingBoxes)
-					&& !this.cursorBoundingBox.collidesAny(this.parentScreen.staticWidgets)
+					&& !this.cursorBoundingBox.collidesAny(this.parentScreen.staticWidgets.stream()
+							.map(sw -> sw.getBoundingBox()).collect(Collectors.toList()))
 					&& !this.cursorBoundingBox.isWithinAny(widgetBoundingBoxes)) {
 				finalPos = this.cursorPos.subtract(this.mouseOffset);
 			}
@@ -194,7 +197,8 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	 */
 	protected boolean resolveStaticCollisions() {
 		boolean result = false;
-		for (BoundingBox2D box : this.parentScreen.staticWidgets) {
+		for (BoundingBox2D box : this.parentScreen.staticWidgets.stream().map(sw -> sw.getBoundingBox())
+				.collect(Collectors.toList())) {
 			// Left and Right collision
 			if ((this.getBoundingBox().getVelocity().x > 0 && this.getBoundingBox().collidesOnLeft(box))
 					|| (this.getBoundingBox().getVelocity().x < 0 && this.getBoundingBox().collidesOnRight(box))) {

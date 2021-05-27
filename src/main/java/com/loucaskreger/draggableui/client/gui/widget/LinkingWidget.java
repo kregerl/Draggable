@@ -144,7 +144,8 @@ public class LinkingWidget extends DraggableWidget {
 				List<BoundingBox2D> widgetBoundingBoxes = this.getWidgetBounds();
 
 				if ((resStatic || resDynamic) && !linkedWidgetBox.collidesAny(widgetBoundingBoxes)
-						&& !linkedWidgetBox.collidesAny(widget.get().getParentScreen().staticWidgets)
+						&& !linkedWidgetBox.collidesAny(widget.get().getParentScreen().staticWidgets.stream()
+								.map(sw -> sw.getBoundingBox()).collect(Collectors.toList()))
 						&& !linkedWidgetBox.isWithinAny(widgetBoundingBoxes)) {
 
 					linkedWidgetBox.setVelocity(
@@ -162,7 +163,8 @@ public class LinkingWidget extends DraggableWidget {
 				if (!widget.get().getCursorBoundingBox().equals(simulatedBoundingBox)
 						&& !widget.get().getCursorBoundingBox().collidesAny(widgetBoundingBoxes)
 						&& !widget.get().getCursorBoundingBox()
-								.collidesAny(widget.get().getParentScreen().staticWidgets)
+								.collidesAny(widget.get().getParentScreen().staticWidgets.stream()
+										.map(sw -> sw.getBoundingBox()).collect(Collectors.toList()))
 						&& !widget.get().getCursorBoundingBox().isWithinAny(widgetBoundingBoxes)) {
 					finalPos = this.cursorPos.subtract(widget.get().getOffset());
 				}
