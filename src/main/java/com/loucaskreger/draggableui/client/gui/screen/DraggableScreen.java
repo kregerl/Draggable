@@ -5,19 +5,24 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_U;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_Z;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import com.loucaskreger.draggableui.client.gui.widget.ContainerScreenWidget;
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
+import com.loucaskreger.draggableui.client.gui.widget.RightClickWidget;
 import com.loucaskreger.draggableui.client.gui.widget.StaticWidget;
 import com.loucaskreger.draggableui.init.WidgetRegistry;
 import com.loucaskreger.draggableui.util.BoundingBox2D;
 import com.loucaskreger.draggableui.util.Vec2i;
 import com.loucaskreger.draggableui.util.WidgetManager;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
@@ -35,7 +40,7 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 	public List<DraggableWidget> widgets;
 	// static objects that cant be moved
 	public List<StaticWidget> staticWidgets;
-	private StaticWidget rightClickMenu;
+	private RightClickWidget rightClickMenu;
 
 	public DraggableScreen(ITextComponent titleIn) {
 		super(titleIn);
@@ -45,7 +50,7 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 		this.height = mc.getMainWindow().getScaledHeight();
 		this.width = mc.getMainWindow().getScaledWidth();
 
-		this.rightClickMenu = new StaticWidget(new BoundingBox2D(0, 0, 70, 90), this);
+		this.rightClickMenu = new RightClickWidget(new BoundingBox2D(0, 0, 70, 90), this);
 
 		if (WidgetManager.INSTANCE.isDirty()) {
 			WidgetManager.INSTANCE.loadWidgets();
@@ -142,9 +147,9 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 		}
 		this.rightClickMenu.mouseClicked(mouseX, mouseY, mouseButton, this);
 
-		if (mouseButton == 1 && this.rightClickMenu.getButton() != null) {
-			this.addButton(this.rightClickMenu.getButton());
-		}
+//		if (mouseButton == 1 && this.rightClickMenu.getButton() != null) {
+//			this.addButton(this.rightClickMenu.getButton());
+//		}
 		return super.mouseClicked(mouseX, mouseY, mouseButton);
 
 	}
@@ -175,9 +180,9 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 		// Used for hover detection
 		this.widgets.forEach(i -> i.mouseMoved(mouseX, mouseY));
 		this.rightClickMenu.mouseMoved(mouseX, mouseY);
-		if (!this.rightClickMenu.isMouseClicked() && this.rightClickMenu.getButton() != null) {
-			this.buttons.remove(this.rightClickMenu.getButton());
-		}
+//		if (!this.rightClickMenu.isMouseClicked() && this.rightClickMenu.getButton() != null) {
+//			this.buttons.remove(this.rightClickMenu.getButton());
+//		}
 	}
 
 	@Override
@@ -248,6 +253,19 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 
 		}
 		return true;
+	}
+
+	@Override
+	public <T extends Widget> T addButton(T p_addButton_1_) {
+		return super.addButton(p_addButton_1_);
+	}
+
+	public <T extends Widget> void addAllButtons(List<T> buttons) {
+		buttons.forEach(button -> this.addButton(button));
+	}
+
+	public List<Widget> getButtons() {
+		return this.buttons;
 	}
 
 	public static void open() {

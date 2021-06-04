@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 import com.loucaskreger.draggableui.client.gui.screen.DraggableScreen;
 import com.loucaskreger.draggableui.util.BoundingBox2D;
+import com.loucaskreger.draggableui.util.Canvas;
 import com.loucaskreger.draggableui.util.Color4f;
 import com.loucaskreger.draggableui.util.Util;
 import com.loucaskreger.draggableui.util.Vec2i;
@@ -29,6 +30,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 	protected Vec2i mouseOffset;
 	protected Vec2i cursorPos;
 	protected Vec2i prevCursorPos;
+	protected Canvas canvas;
 	protected WidgetType type;
 
 	private boolean isEnabled;
@@ -59,6 +61,7 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 		this.defaultPosition = null;
 		this.mouseOffset = Vec2i.ZERO;
 		this.type = WidgetType.ANY;
+		this.canvas = new Canvas(this.getBoundingBox());
 //		this.uuid = UUID.randomUUID();
 	}
 
@@ -265,8 +268,10 @@ public class DraggableWidget extends ForgeRegistryEntry<DraggableWidget> impleme
 
 	public void render(int mouseX, int mouseY, float partialTicks, AbstractGui screen) {
 		if (this.isEnabled()) {
+			this.canvas.render(screen);
 			if (this.getBoundingBox().isVisible()) {
 				this.getBoundingBox().drawBoundingBoxOutline();
+
 				if (this.cursorBoundingBox != null && this.cursorBoundingBox.isVisible()) {
 					this.cursorBoundingBox.drawBoundingBoxOutline();
 				}

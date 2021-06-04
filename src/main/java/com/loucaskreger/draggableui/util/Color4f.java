@@ -6,6 +6,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 public class Color4f implements INBTSerializable<CompoundNBT> {
 
 	public static final Color4f BLANK = new Color4f(1.0f, 1.0f, 1.0f, 0.0f);
+	public static final Color4f WHITE = new Color4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 	public float red;
 	public float green;
