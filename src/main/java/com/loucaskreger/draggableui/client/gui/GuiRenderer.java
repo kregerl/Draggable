@@ -7,10 +7,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.loucaskreger.draggableui.DraggableUI;
-import com.loucaskreger.draggableui.EventSubscriber;
+import com.loucaskreger.draggableui.client.EventSubscriber;
 import com.loucaskreger.draggableui.client.gui.screen.DraggableScreen;
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
 import com.loucaskreger.draggableui.client.gui.widget.ITickableWidget;
+import com.loucaskreger.draggableui.util.DeathHistoryManager;
 import com.loucaskreger.draggableui.util.WidgetManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -34,12 +35,12 @@ import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 @Mod.EventBusSubscriber(modid = DraggableUI.MOD_ID)
 public class GuiRenderer {
 
 	public static Deque<ItemStack> recentCrafts = new LinkedList<ItemStack>();
+	private static boolean isDead = false;
 
 	public static final KeyBinding key = new KeyBinding(DraggableUI.MOD_ID + ".key.press", GLFW_KEY_K,
 			DraggableUI.MOD_ID + ".key.categories");
@@ -51,9 +52,9 @@ public class GuiRenderer {
 	@SubscribeEvent
 	public static void renderGameOverlayPost(final RenderGameOverlayEvent.Post event) {
 		if (event.getType().equals(RenderGameOverlayEvent.ElementType.ALL) && mc.currentScreen == null) {
-			if (WidgetManager.INSTANCE.isDirty()) {
-				WidgetManager.INSTANCE.loadWidgets();
-			}
+//			if (WidgetManager.INSTANCE.isDirty()) {
+//				WidgetManager.INSTANCE.loadWidgets();
+//			}
 			List<DraggableWidget> widgets = WidgetManager.INSTANCE.getWidgets();
 			for (DraggableWidget widget : widgets) {
 				if (widget instanceof ITickableWidget) {
@@ -83,11 +84,21 @@ public class GuiRenderer {
 			}
 
 			highlightingItemStack = itemstack;
+
+			// If this is not 0, player died.
+			if (mc.player.deathTime > 0 && !isDead && DeathHistoryManager.INSTANCE != null) {
+				isDead = true;
+				DeathHistoryManager.INSTANCE.addDeath(mc.player.getPosition());
+			} else if (mc.player.deathTime == 0) {
+				isDead = false;
+			}
 		}
 
 		if (key.isPressed()) {
 			EventSubscriber.renderDefaults = false;
-			DraggableScreen.open();
+			WidgetManager.INSTANCE.loadWidgets();
+//			DraggableScreen.open(new StringTextComponent("Test"), WidgetManager.INSTANCE.getWidgets());
+			DraggableScreen.open(mc.playerController.getCurrentGameType());
 		}
 	}
 

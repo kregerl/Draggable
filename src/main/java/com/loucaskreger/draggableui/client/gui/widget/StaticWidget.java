@@ -39,6 +39,7 @@ public class StaticWidget implements INBTSerializable<CompoundNBT> {
 	}
 
 	public void render(int mouseX, int mouseY, float partialTicks, AbstractGui screen) {
+		this.canvas.render(this.getBoundingBox().getPos().x, this.getBoundingBox().getPos().y, screen);
 	}
 
 	@Nullable

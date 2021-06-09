@@ -216,6 +216,7 @@ public class BoundingBox2D implements INBTSerializable<CompoundNBT> {
 		this.setHeight(nbt.getInt("height"));
 		this.setVisible(nbt.getBoolean("visible"));
 		this.setColor(new Color4f((CompoundNBT) nbt.get("color")));
+//		this.color.deserializeNBT(nbt.getCompound("color"));
 	}
 
 	public static BoundingBox2D read(CompoundNBT nbt) {

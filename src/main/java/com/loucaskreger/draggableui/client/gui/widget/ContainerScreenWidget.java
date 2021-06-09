@@ -1,5 +1,7 @@
 package com.loucaskreger.draggableui.client.gui.widget;
 
+import java.util.function.Supplier;
+
 import com.loucaskreger.draggableui.util.Vec2i;
 import com.loucaskreger.draggableui.util.WidgetType;
 import net.minecraft.client.gui.AbstractGui;
@@ -8,15 +10,27 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class ContainerScreenWidget extends DraggableWidget {
 
+	private Supplier<ContainerScreen<?>> screenSup;
 	private ContainerScreen<?> screen;
 	protected boolean canBeDragged;
 
-	public ContainerScreenWidget(ContainerScreen<?> screen) {
-		super(screen.getGuiLeft(), screen.getGuiTop(), screen.getXSize(), screen.getYSize());
-		this.screen = screen;
+	public ContainerScreenWidget(Supplier<ContainerScreen<?>> screen) {
+		super(0, 0, 0, 0);
+		this.screenSup = screen;
 		this.canBeDragged = true;
 		this.isSerilizable = false;
 		this.type = WidgetType.CONTAINER;
+	}
+
+	@Override
+	public void init() {
+		super.init();
+		if (this.screenSup.get() != null) {
+			this.screen = this.screenSup.get();
+			this.getBoundingBox().setPos(new Vec2i(this.screen.getGuiLeft(), this.screen.getGuiTop()));
+			this.getBoundingBox().setWidth(this.screen.getXSize());
+			this.getBoundingBox().setHeight(this.screen.getYSize());
+		}
 	}
 
 	@Override

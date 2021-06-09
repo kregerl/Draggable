@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.loucaskreger.draggableui.client.gui.widget.ContainerScreenWidget;
+import com.loucaskreger.draggableui.client.gui.widget.DeathHistoryWidget;
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
 import com.loucaskreger.draggableui.client.gui.widget.RightClickWidget;
 import com.loucaskreger.draggableui.client.gui.widget.StaticWidget;
@@ -29,8 +30,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.GameType;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public class DraggableScreen extends Screen implements INBTSerializable<CompoundNBT> {
 
@@ -51,26 +50,6 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 		this.width = mc.getMainWindow().getScaledWidth();
 
 		this.rightClickMenu = new RightClickWidget(new BoundingBox2D(0, 0, 70, 90), this);
-
-		if (WidgetManager.INSTANCE.isDirty()) {
-			WidgetManager.INSTANCE.loadWidgets();
-		}
-		WidgetManager.INSTANCE.widgets.forEach(i -> {
-			i.setScreen(this);
-			i.setEnabled(true);
-			i.setShouldMoveToDefaultPos(false);
-			this.widgets.add(i);
-		});
-		if (WidgetManager.INSTANCE.widgets.isEmpty()) {
-			IForgeRegistry<DraggableWidget> registry = GameRegistry.findRegistry(DraggableWidget.class);
-			for (DraggableWidget widget : registry) {
-				widget.setShouldMoveToDefaultPos(true);
-				widget.setScreen(this);
-				widget.setEnabled(true);
-				this.widgets.add(widget);
-			}
-
-		}
 
 		// Bottom Bound
 		this.staticWidgets.add(
@@ -106,11 +85,24 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 			widget.setShouldMoveToDefaultPos(false);
 			this.widgets.add(widget);
 		}
+
+	}
+
+	public DraggableScreen(ITextComponent title, List<DraggableWidget> widgets) {
+		this(title, listToArray(widgets));
+	}
+
+	private static DraggableWidget[] listToArray(List<DraggableWidget> widgets) {
+		DraggableWidget[] widgetsArr = new DraggableWidget[widgets.size()];
+		for (int i = 0; i < widgets.size(); i++) {
+			widgetsArr[i] = widgets.get(i);
+		}
+		return widgetsArr;
 	}
 
 	public DraggableScreen(ContainerScreen<?> previousScreen, ITextComponent title, DraggableWidget... widgets) {
 		this(title, widgets);
-		this.widgets.add(0, new ContainerScreenWidget(previousScreen));
+		this.widgets.add(0, new ContainerScreenWidget(() -> previousScreen));
 	}
 
 	public DraggableScreen() {
@@ -119,7 +111,7 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 
 	public DraggableScreen(ContainerScreen<?> previousScreen) {
 		this(new StringTextComponent("test"));
-		this.widgets.add(new ContainerScreenWidget(previousScreen));
+		this.widgets.add(new ContainerScreenWidget(() -> previousScreen));
 	}
 
 	@Override
@@ -202,11 +194,11 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 
 	@Override
 	public void onClose() {
-		WidgetManager.INSTANCE
-				.saveState(this.widgets.stream().filter(i -> i.isSerilizable()).collect(Collectors.toList()));
 		this.widgets.forEach(i -> {
 			i.onClose();
 		});
+		WidgetManager.INSTANCE
+				.saveState(this.widgets.stream().filter(i -> i.isSerilizable()).collect(Collectors.toList()));
 		super.onClose();
 
 	}
@@ -280,6 +272,10 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 		Minecraft.getInstance().displayGuiScreen(new DraggableScreen(title, widgets));
 	}
 
+	public static void open(ITextComponent title, List<DraggableWidget> widgets) {
+		Minecraft.getInstance().displayGuiScreen(new DraggableScreen(title, widgets));
+	}
+
 	public static void open(GameType type) {
 		switch (type) {
 		case SURVIVAL:
@@ -287,16 +283,52 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 			DraggableScreen.open(new StringTextComponent(type.getName()), WidgetRegistry.HEALTH_WIDGET.get(),
 					WidgetRegistry.HUNGER_WIDGET.get(), WidgetRegistry.HOTBAR_WIDGET.get(),
 					WidgetRegistry.EXPERIENCE_LEVEL_WIDGET.get(), WidgetRegistry.OFFHAND_WIDGET.get(),
-					WidgetRegistry.SELECTED_ITEM_WIDGET.get());
+					WidgetRegistry.SELECTED_ITEM_WIDGET.get(), WidgetRegistry.DEATH_HISTORY_WIDGET.get());
 			break;
 		case CREATIVE:
 
-			break;
+			break;// if (WidgetManager.INSTANCE.isDirty()) {
+//			WidgetManager.INSTANCE.loadWidgets();
+//		}
+//		WidgetManager.INSTANCE.widgets.forEach(i -> {
+//			i.setScreen(this);
+//			i.setEnabled(true);
+//			i.setShouldMoveToDefaultPos(false);
+//			this.widgets.add(i);
+//		});
+//		if (WidgetManager.INSTANCE.widgets.isEmpty()) {
+//			IForgeRegistry<DraggableWidget> registry = GameRegistry.findRegistry(DraggableWidget.class);
+//			for (DraggableWidget widget : registry) {
+//				widget.setShouldMoveToDefaultPos(true);
+//				widget.setScreen(this);
+//				widget.setEnabled(true);
+//				this.widgets.add(widget);
+//			}
+//
+//		}
 		case SPECTATOR:
 			break;
 		case NOT_SET:
 		default:
-			break;
+			break;// if (WidgetManager.INSTANCE.isDirty()) {
+//			WidgetManager.INSTANCE.loadWidgets();
+//		}
+//		WidgetManager.INSTANCE.widgets.forEach(i -> {
+//			i.setScreen(this);
+//			i.setEnabled(true);
+//			i.setShouldMoveToDefaultPos(false);
+//			this.widgets.add(i);
+//		});
+//		if (WidgetManager.INSTANCE.widgets.isEmpty()) {
+//			IForgeRegistry<DraggableWidget> registry = GameRegistry.findRegistry(DraggableWidget.class);
+//			for (DraggableWidget widget : registry) {
+//				widget.setShouldMoveToDefaultPos(true);
+//				widget.setScreen(this);
+//				widget.setEnabled(true);
+//				this.widgets.add(widget);
+//			}
+//
+//		}
 
 		}
 	}
@@ -305,6 +337,8 @@ public class DraggableScreen extends Screen implements INBTSerializable<Compound
 		switch (type) {
 		case SURVIVAL:
 		case ADVENTURE:
+			Minecraft.getInstance()
+					.displayGuiScreen(new DraggableScreen(previousScreen, new StringTextComponent(type.getName())));
 			break;
 		case CREATIVE:
 			Minecraft.getInstance()

@@ -2,10 +2,13 @@ package com.loucaskreger.draggableui;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import com.loucaskreger.draggableui.client.gui.GuiRenderer;
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
 import com.loucaskreger.draggableui.init.WidgetRegistry;
+import com.loucaskreger.draggableui.util.DeathHistoryManager;
 import com.loucaskreger.draggableui.util.WidgetManager;
+
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -32,11 +35,10 @@ public class DraggableUI {
 
 		WidgetManager.init();
 		WidgetRegistry.WIDGETS.register(bus);
-
 	}
 
 	private void setupCommon(final FMLCommonSetupEvent event) {
-		
+
 	}
 
 	private void setupClient(final FMLClientSetupEvent event) {

@@ -5,14 +5,14 @@ import com.loucaskreger.draggableui.DraggableUI;
 import net.minecraft.util.ResourceLocation;
 
 public enum RegistryNames {
-	HUNGER_WIDGET(new ResourceLocation(DraggableUI.MOD_ID, "hunger_widget")),
-	HEALTH_WIDGET(new ResourceLocation(DraggableUI.MOD_ID, "health_widget")),
-	EXP_WIDGET(new ResourceLocation(DraggableUI.MOD_ID, "experience_widget")),
-	HOTBAR_WIDGET(new ResourceLocation(DraggableUI.MOD_ID, "hotbar_widget")),
-	EXPERIENCE_LEVEL_WIDGET(new ResourceLocation(DraggableUI.MOD_ID, "experience_level_widget")),
-	OFFHAND_WIDGET(new ResourceLocation(DraggableUI.MOD_ID, "offhand_widget")),
-	SELECTED_ITEM_WIDGET(new ResourceLocation(DraggableUI.MOD_ID, "selected_item_widget")),
-	COORDINATE_WIDGET(new ResourceLocation(DraggableUI.MOD_ID, "coordinate_widget"));
+	HUNGER_WIDGET(createRegistryName("hunger_widget")), HEALTH_WIDGET(createRegistryName("health_widget")),
+	EXP_WIDGET(createRegistryName("experience_widget")), HOTBAR_WIDGET(createRegistryName("hotbar_widget")),
+	EXPERIENCE_LEVEL_WIDGET(createRegistryName("experience_level_widget")),
+	OFFHAND_WIDGET(createRegistryName("offhand_widget")),
+	SELECTED_ITEM_WIDGET(createRegistryName("selected_item_widget")),
+	COORDINATE_WIDGET(createRegistryName("coordinate_widget")),
+	CONTAINER_SCREEN_WIDGET(createRegistryName("container_screen_widget")),
+	DEATH_HISTORY_WIDGET(createRegistryName("death_history_widget"));
 
 	private ResourceLocation location;
 
@@ -30,5 +30,9 @@ public enum RegistryNames {
 
 	public ResourceLocation getResourceLocation() {
 		return this.location;
+	}
+
+	private static ResourceLocation createRegistryName(String id) {
+		return new ResourceLocation(DraggableUI.MOD_ID, id);
 	}
 }

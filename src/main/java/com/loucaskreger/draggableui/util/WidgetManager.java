@@ -25,7 +25,7 @@ public class WidgetManager {
 	private static final String LIST_KEY = "list";
 	public static WidgetManager INSTANCE;
 	public List<DraggableWidget> widgets;
-	private boolean isDirty;
+//	private boolean isDirty;
 
 	public static void init() {
 		INSTANCE = new WidgetManager();
@@ -33,7 +33,7 @@ public class WidgetManager {
 
 	public WidgetManager() {
 		this.widgets = new ArrayList<DraggableWidget>();
-		this.isDirty = true;
+//		this.isDirty = true;
 		File file = path.toFile();
 		try {
 			file.getParentFile().mkdirs();
@@ -44,6 +44,7 @@ public class WidgetManager {
 	}
 
 	public void loadWidgets() {
+		System.out.println("Here");
 		File file = path.toFile();
 		if (file.length() != 0) {
 			try {
@@ -53,7 +54,7 @@ public class WidgetManager {
 				ListNBT list = (ListNBT) nbt.get(LIST_KEY);
 				for (int i = 0; i < list.size(); i++) {
 					CompoundNBT tag = list.getCompound(i);
-					widgets.add(this.read(tag));
+					this.widgets.add(this.read(tag));
 				}
 			} catch (IOException e) {
 				DraggableUI.LOGGER.error(e);
@@ -70,6 +71,7 @@ public class WidgetManager {
 	}
 
 	public void saveState(List<DraggableWidget> widgets) {
+		this.widgets = widgets;
 		File file = path.toFile();
 		CompoundNBT parent = new CompoundNBT();
 		ListNBT nbt = new ListNBT();
@@ -83,20 +85,20 @@ public class WidgetManager {
 			CompressedStreamTools.writeCompressed(parent, fileoutputstream);
 			fileoutputstream.close();
 			// Mark dirty so so load can be called
-			this.isDirty = true;
+//			this.isDirty = true;
 		} catch (IOException e) {
 			DraggableUI.LOGGER.error(e);
 		}
 
 	}
 
-	public boolean isDirty() {
-		return this.isDirty;
-	}
-
-	public void setIsDirty(boolean dirty) {
-		this.isDirty = dirty;
-	}
+//	public boolean isDirty() {
+//		return this.isDirty;
+//	}
+//
+//	public void setIsDirty(boolean dirty) {
+//		this.isDirty = dirty;
+//	}
 
 	public List<DraggableWidget> getWidgets() {
 		return this.widgets;

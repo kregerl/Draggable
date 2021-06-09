@@ -1,7 +1,9 @@
 package com.loucaskreger.draggableui.init;
 
 import com.loucaskreger.draggableui.DraggableUI;
+import com.loucaskreger.draggableui.client.gui.widget.ContainerScreenWidget;
 import com.loucaskreger.draggableui.client.gui.widget.CoordinateWidget;
+import com.loucaskreger.draggableui.client.gui.widget.DeathHistoryWidget;
 import com.loucaskreger.draggableui.client.gui.widget.DraggableWidget;
 import com.loucaskreger.draggableui.client.gui.widget.ExperienceLevelWidget;
 import com.loucaskreger.draggableui.client.gui.widget.ExperienceWidget;
@@ -12,6 +14,7 @@ import com.loucaskreger.draggableui.client.gui.widget.LinkableWidget;
 import com.loucaskreger.draggableui.client.gui.widget.LinkingWidget;
 import com.loucaskreger.draggableui.client.gui.widget.OffhandWidget;
 import com.loucaskreger.draggableui.client.gui.widget.SelectedItemTextWidget;
+
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 
@@ -28,6 +31,12 @@ public class WidgetRegistry {
 
 	public static final RegistryObject<DraggableWidget> COORDINATE_WIDGET = WIDGETS
 			.register(RegistryNames.COORDINATE_WIDGET.getPath(), CoordinateWidget::new);
+
+	public static final RegistryObject<DraggableWidget> DEATH_HISTORY_WIDGET = WIDGETS
+			.register(RegistryNames.DEATH_HISTORY_WIDGET.getPath(), DeathHistoryWidget::new);
+
+	public static final RegistryObject<DraggableWidget> CONTAINER_SCREEN_WIDGET = WIDGETS
+			.register(RegistryNames.CONTAINER_SCREEN_WIDGET.getPath(), () -> new ContainerScreenWidget(null));
 
 //	Linking Widgets ----------------------------------------------------------------------------------------------
 	public static final RegistryObject<LinkingWidget> EXP_WIDGET = WIDGETS.register(RegistryNames.EXP_WIDGET.getPath(),

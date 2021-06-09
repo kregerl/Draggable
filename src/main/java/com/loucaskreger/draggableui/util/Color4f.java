@@ -29,6 +29,10 @@ public class Color4f implements INBTSerializable<CompoundNBT> {
 		this.deserializeNBT(nbt);
 	}
 
+	public int toIntegerColor() {
+		return (int) (0x10000 * this.red + 0x100 * this.green + this.blue);
+	}
+
 	@Override
 	public CompoundNBT serializeNBT() {
 		CompoundNBT nbt = new CompoundNBT();
